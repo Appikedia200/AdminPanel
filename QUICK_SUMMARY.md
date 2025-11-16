@@ -1,5 +1,23 @@
 # 🎯 AdminPanel Issues - Quick Summary
 
+## 🚨 CRITICAL REQUIREMENT: NO FAKE DATA
+
+**EVERYTHING MUST START EMPTY AND COUNT FROM ZERO:**
+- ❌ NO fake products
+- ❌ NO placeholder data
+- ❌ NO hardcoded counts
+- ✅ ALL data from backend API
+- ✅ Empty states with "Add First Item" buttons
+- ✅ Real-time counting as admin adds data
+
+**Fresh Install Behavior:**
+- Dashboard: 0 products, 0 orders, ₦0 revenue (from backend API, not hardcoded)
+- Products page: Empty state → "No products yet. Add your first product" button
+- Orders page: Empty state → "No orders yet"
+- When admin adds 1 product → Count becomes 1 (live update from backend)
+
+---
+
 ## What's Broken?
 
 ### 🔴 CRITICAL (Blocks Core Functionality)
@@ -11,9 +29,10 @@
 
 ### ⚠️ IMPORTANT (Missing Features)
 6. **Settings incomplete** - Missing WhatsApp, social media, email templates
-7. **Dashboard shows fake data** - All stats hardcoded to "0"
+7. **Dashboard shows hardcoded data** - All stats must come from backend API (starts at 0)
 8. **Media library empty** - Placeholder page only
-9. **Review badge hardcoded** - Shows "12" always
+9. **Review badge hardcoded** - Shows "12" always (must be dynamic from API)
+10. **No empty states** - Pages need proper empty states with CTAs
 
 ## What to Give Cursor?
 

@@ -23,6 +23,64 @@ Admin Panel only:
 - Shows loading/error states
 - Provides good UX
 
+**🚨 CRITICAL REQUIREMENT: NO FAKE DATA 🚨**
+
+**EVERYTHING MUST START EMPTY AND REFLECT REAL DATA:**
+- ❌ NO fake products in the database
+- ❌ NO placeholder/demo data
+- ❌ NO hardcoded counts (not even "0")
+- ✅ Fetch ALL data from backend API in real-time
+- ✅ Show empty states with clear CTAs (e.g., "No products yet. Add your first product")
+- ✅ Counts update live as admins add products, orders, reviews, etc.
+
+**Example:**
+- Fresh install → Dashboard shows: "0 products" (from API, not hardcoded)
+- Admin adds 1 product → Dashboard shows: "1 product" (from API)
+- Admin adds 5 more → Dashboard shows: "6 products" (from API)
+
+**Dashboard Stats:**
+```typescript
+// ❌ WRONG - Hardcoded
+const stats = { products: 0, orders: 0, revenue: 0 }
+
+// ✅ CORRECT - From backend API
+const { data: stats } = await apiClient.get('/api/dashboard/stats')
+// Shows real numbers: { products: 0, orders: 0, revenue: 0 } on fresh install
+// Shows real numbers: { products: 45, orders: 128, revenue: 45890 } after adding data
+```
+
+**Product List:**
+```typescript
+// ❌ WRONG - Fake products
+const products = [
+  { name: "Demo Product 1", price: 1000 },
+  { name: "Demo Product 2", price: 2000 }
+]
+
+// ✅ CORRECT - From backend API
+const { data: products } = await apiClient.get('/api/products')
+// Returns [] on fresh install
+// Returns real products after admin adds them
+
+// Show empty state when no products
+{products.length === 0 ? (
+  <div className="text-center py-12">
+    <p className="text-muted-foreground mb-4">No products yet</p>
+    <Button onClick={() => router.push('/products/new')}>
+      Add Your First Product
+    </Button>
+  </div>
+) : (
+  <ProductTable products={products} />
+)}
+```
+
+**All Empty States Must Have:**
+1. Clear message: "No [items] yet"
+2. Icon or illustration (optional but recommended)
+3. Call-to-action button: "Add Your First [Item]"
+4. Helpful text: "Get started by adding your first product to the store"
+
 ---
 
 ## 🔴 CRITICAL ISSUES TO FIX
@@ -321,44 +379,143 @@ const { data: categories } = await apiClient.get('/api/categories')
 ### 4. DASHBOARD STATS NOT WORKING ❌
 
 **Current:** All stats hardcoded to "0"
+**Problem:** Stats don't reflect real data from backend
+
 **Fix Required:**
 
 ```typescript
 // /src/app/(dashboard)/page.tsx
 
-// 1. Fetch stats on page load
-const { data: stats } = await apiClient.get('/api/dashboard/stats')
+// ❌ REMOVE ANY HARDCODED VALUES
+// const stats = { products: 0, orders: 0 } // DELETE THIS
 
-// Backend returns:
-{
-  products: {
-    total: number,
-    active: number,
-    lowStock: number
-  },
-  orders: {
-    total: number,
-    pending: number,
-    processing: number,
-    completed: number,
-    revenue: number
-  },
-  reviews: {
-    total: number,
-    pending: number,
-    approved: number,
-    averageRating: number
-  },
-  customers: {
-    total: number,
-    new: number
+// ✅ FETCH REAL DATA FROM BACKEND
+'use client'
+import { useEffect, useState } from 'react'
+import { apiClient } from '@/infrastructure/api/client'
+
+export default function DashboardPage() {
+  const [stats, setStats] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setIsLoading(true)
+        const response = await apiClient.get('/api/dashboard/stats')
+
+        if (response.success) {
+          setStats(response.data)
+        }
+      } catch (err: any) {
+        setError(err.error || 'Failed to load stats')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchStats()
+  }, [])
+
+  // Show loading skeleton while fetching
+  if (isLoading) {
+    return <DashboardSkeleton />
   }
-}
 
-// 2. Display in dashboard cards
-// 3. Add loading skeleton while fetching
-// 4. Handle errors gracefully
+  // Show error state
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-destructive">{error}</p>
+        <Button onClick={() => window.location.reload()}>Retry</Button>
+      </div>
+    )
+  }
+
+  // Backend returns REAL numbers (could be 0 on fresh install):
+  // {
+  //   products: { total: 0, active: 0, lowStock: 0 },
+  //   orders: { total: 0, pending: 0, revenue: 0 },
+  //   reviews: { total: 0, pending: 0, averageRating: 0 },
+  //   customers: { total: 0, new: 0 }
+  // }
+
+  return (
+    <div className="space-y-6">
+      {/* Stats Cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <StatsCard
+          title="Total Products"
+          value={stats.products.total} // Real number from backend
+          subtitle={`${stats.products.active} active`}
+          icon={Package}
+        />
+        <StatsCard
+          title="Total Orders"
+          value={stats.orders.total} // Real number from backend
+          subtitle={`${stats.orders.pending} pending`}
+          icon={ShoppingCart}
+        />
+        <StatsCard
+          title="Revenue"
+          value={`₦${stats.orders.revenue.toLocaleString()}`} // Real revenue
+          subtitle="Total earnings"
+          icon={DollarSign}
+        />
+        <StatsCard
+          title="Reviews"
+          value={stats.reviews.total} // Real number from backend
+          subtitle={`${stats.reviews.averageRating}⭐ average`}
+          icon={Star}
+        />
+      </div>
+
+      {/* Empty State - Show when no products exist */}
+      {stats.products.total === 0 && (
+        <Card className="p-8">
+          <div className="text-center">
+            <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No products yet</h3>
+            <p className="text-muted-foreground mb-4">
+              Get started by adding your first product to the store
+            </p>
+            <Button onClick={() => router.push('/products/new')}>
+              Add Your First Product
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      {/* Quick Actions - Always show */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-3">
+          <Button variant="outline" onClick={() => router.push('/products/new')}>
+            Add Product
+          </Button>
+          <Button variant="outline" onClick={() => router.push('/categories')}>
+            Manage Categories
+          </Button>
+          <Button variant="outline" onClick={() => router.push('/orders')}>
+            View Orders
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
 ```
+
+**CRITICAL RULES:**
+1. ✅ Always fetch stats from `/api/dashboard/stats`
+2. ❌ NEVER hardcode stats values
+3. ✅ Show loading skeleton while fetching
+4. ✅ Show empty state when total products = 0
+5. ✅ Stats automatically update when admin adds products/orders
+6. ✅ Use real numbers even if they're 0 (from backend, not hardcoded)
 
 **Files to Update:**
 - `/src/app/(dashboard)/page.tsx`
@@ -455,6 +612,211 @@ export const config = {
 
 **Files to Create:**
 - `/src/middleware.ts`
+
+---
+
+### 8. EMPTY STATES FOR ALL PAGES (REQUIRED) ✅
+
+**CRITICAL:** Every page that displays lists MUST have proper empty states with NO fake data.
+
+#### Products Page Empty State
+```typescript
+// /src/app/(dashboard)/products/page.tsx
+
+const { data: products, pagination } = await apiClient.get('/api/products')
+
+// When no products exist (fresh install or all deleted)
+if (products.length === 0) {
+  return (
+    <div className="flex flex-col items-center justify-center py-12">
+      <Package className="h-16 w-16 text-muted-foreground mb-4" />
+      <h2 className="text-2xl font-semibold mb-2">No products yet</h2>
+      <p className="text-muted-foreground text-center mb-6 max-w-md">
+        Start building your store by adding your first product.
+        You can add product details, images, pricing, and inventory.
+      </p>
+      <Button onClick={() => router.push('/products/new')}>
+        <Plus className="mr-2 h-4 w-4" />
+        Add Your First Product
+      </Button>
+    </div>
+  )
+}
+
+// When products exist, show table/grid
+return <ProductTable products={products} pagination={pagination} />
+```
+
+#### Categories Page Empty State
+```typescript
+// /src/app/(dashboard)/categories/page.tsx
+
+const { data: categories } = await apiClient.get('/api/categories')
+
+if (categories.length === 0) {
+  return (
+    <div className="flex flex-col items-center justify-center py-12">
+      <FolderOpen className="h-16 w-16 text-muted-foreground mb-4" />
+      <h2 className="text-2xl font-semibold mb-2">No categories yet</h2>
+      <p className="text-muted-foreground text-center mb-6 max-w-md">
+        Organize your products by creating categories.
+        Categories help customers find what they're looking for.
+      </p>
+      <Button onClick={openCreateCategoryDialog}>
+        <Plus className="mr-2 h-4 w-4" />
+        Create Your First Category
+      </Button>
+    </div>
+  )
+}
+
+return <CategoriesTable categories={categories} />
+```
+
+#### Orders Page Empty State
+```typescript
+// /src/app/(dashboard)/orders/page.tsx
+
+const { data: orders, pagination } = await apiClient.get('/api/orders')
+
+if (orders.length === 0) {
+  return (
+    <div className="flex flex-col items-center justify-center py-12">
+      <ShoppingCart className="h-16 w-16 text-muted-foreground mb-4" />
+      <h2 className="text-2xl font-semibold mb-2">No orders yet</h2>
+      <p className="text-muted-foreground text-center mb-6 max-w-md">
+        When customers place orders, they'll appear here.
+        You can track order status, manage payments, and update shipping.
+      </p>
+      <div className="flex gap-3">
+        <Button variant="outline" onClick={() => router.push('/products')}>
+          View Products
+        </Button>
+        <Button onClick={() => router.push('/settings')}>
+          Configure Store Settings
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+return <OrdersTable orders={orders} pagination={pagination} />
+```
+
+#### Reviews Page Empty State
+```typescript
+// /src/app/(dashboard)/reviews/page.tsx
+
+const { data: reviews, pagination } = await apiClient.get('/api/reviews')
+
+if (reviews.length === 0) {
+  return (
+    <div className="flex flex-col items-center justify-center py-12">
+      <Star className="h-16 w-16 text-muted-foreground mb-4" />
+      <h2 className="text-2xl font-semibold mb-2">No reviews yet</h2>
+      <p className="text-muted-foreground text-center mb-6 max-w-md">
+        Customer reviews will appear here once they start rating your products.
+        Reviews help build trust and improve your products.
+      </p>
+      <Button variant="outline" onClick={() => router.push('/products')}>
+        View Products
+      </Button>
+    </div>
+  )
+}
+
+return <ReviewsTable reviews={reviews} pagination={pagination} />
+```
+
+#### Media Library Empty State
+```typescript
+// /src/app/(dashboard)/media/page.tsx
+
+const { data: media, pagination } = await apiClient.get('/api/media')
+
+if (media.length === 0) {
+  return (
+    <div className="flex flex-col items-center justify-center py-12">
+      <ImageIcon className="h-16 w-16 text-muted-foreground mb-4" />
+      <h2 className="text-2xl font-semibold mb-2">No images uploaded yet</h2>
+      <p className="text-muted-foreground text-center mb-6 max-w-md">
+        Upload product images, banners, and other media files.
+        Uploaded images can be used across your store.
+      </p>
+      <Button onClick={handleUpload}>
+        <Upload className="mr-2 h-4 w-4" />
+        Upload Your First Image
+      </Button>
+    </div>
+  )
+}
+
+return <MediaGrid media={media} pagination={pagination} />
+```
+
+#### Dashboard Empty State (No Products)
+```typescript
+// /src/app/(dashboard)/page.tsx
+
+// Already shown in section 4 above
+// Show empty state card when stats.products.total === 0
+```
+
+**EMPTY STATE CHECKLIST - Every Empty State Must Have:**
+
+1. ✅ **Large Icon** (16x16 or h-16 w-16) - Related to the content
+2. ✅ **Clear Heading** - "No [items] yet"
+3. ✅ **Helpful Description** - Explain what this section is for
+4. ✅ **Primary Action Button** - "Add Your First [Item]"
+5. ✅ **Optional Secondary Actions** - Links to related pages
+6. ✅ **Centered Layout** - flex flex-col items-center justify-center
+7. ✅ **Padding** - py-12 for vertical spacing
+8. ❌ **NO FAKE DATA** - Never show placeholder items
+
+**Common Icons to Use:**
+- Products: `Package` from lucide-react
+- Categories: `FolderOpen` from lucide-react
+- Orders: `ShoppingCart` from lucide-react
+- Reviews: `Star` from lucide-react
+- Media: `ImageIcon` from lucide-react
+- Customers: `Users` from lucide-react
+
+**IMPORTANT RULES:**
+
+1. **Always fetch data from backend API first**
+   ```typescript
+   const { data } = await apiClient.get('/api/products')
+   ```
+
+2. **Check if data is empty**
+   ```typescript
+   if (data.length === 0) {
+     // Show empty state
+   }
+   ```
+
+3. **Never use fake data**
+   ```typescript
+   // ❌ WRONG
+   const products = [
+     { id: 1, name: "Sample Product" }
+   ]
+
+   // ✅ CORRECT
+   const { data: products } = await apiClient.get('/api/products')
+   ```
+
+4. **Empty state on fresh install**
+   - Dashboard shows: 0 products, 0 orders, ₦0 revenue (from backend)
+   - Products page shows: Empty state with "Add Your First Product" button
+   - Orders page shows: Empty state
+   - Reviews page shows: Empty state
+   - Media page shows: Empty state
+
+5. **Counts update automatically**
+   - Admin adds 1 product → Dashboard shows: 1 product
+   - Admin adds 5 products → Products page shows table with 5 items
+   - Admin deletes all products → Back to empty state
 
 ---
 

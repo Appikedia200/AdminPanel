@@ -1,5 +1,28 @@
 # ✅ AdminPanel Fix Progress Checklist
 
+## 🚨 CRITICAL REQUIREMENT: NO FAKE DATA
+
+**BEFORE STARTING - ENSURE:**
+- [ ] ❌ Remove ALL hardcoded/fake data
+- [ ] ✅ Fetch ALL data from backend APIs
+- [ ] ✅ Implement empty states for all pages
+- [ ] ✅ Show "Add First Item" CTAs when data is empty
+- [ ] ✅ Real-time counting (backend returns 0 on fresh install, increases as admin adds data)
+
+**Fresh Install Must Show:**
+- Dashboard: 0 products, 0 orders, ₦0 revenue (from API)
+- Products: Empty state with "Add Your First Product" button
+- Orders: Empty state
+- Reviews: Empty state
+- Media: Empty state
+
+**After Adding 1 Product:**
+- Dashboard: 1 product (from API)
+- Products: Table with 1 product
+- Empty states disappear, data tables appear
+
+---
+
 ## 🔴 PHASE 1: CRITICAL FIXES (Must Complete First)
 
 ### Authentication System
@@ -117,6 +140,50 @@
   - [ ] Edit metadata (title, alt text, tags)
   - [ ] Copy Cloudinary URL button
   - [ ] Lightbox for full-size view
+
+### Empty States (ALL PAGES)
+- [ ] **Products Page Empty State**
+  - [ ] Check if products array is empty
+  - [ ] Show Package icon (h-16 w-16)
+  - [ ] Show "No products yet" heading
+  - [ ] Show helpful description
+  - [ ] Add "Add Your First Product" button
+  - [ ] Remove any hardcoded/fake products
+
+- [ ] **Categories Page Empty State**
+  - [ ] Check if categories array is empty
+  - [ ] Show FolderOpen icon
+  - [ ] Show "No categories yet" heading
+  - [ ] Add "Create Your First Category" button
+  - [ ] Remove any hardcoded/fake categories
+
+- [ ] **Orders Page Empty State**
+  - [ ] Check if orders array is empty
+  - [ ] Show ShoppingCart icon
+  - [ ] Show "No orders yet" heading
+  - [ ] Add helpful description about customer orders
+  - [ ] Add secondary action buttons (View Products, Configure Settings)
+  - [ ] Remove any hardcoded/fake orders
+
+- [ ] **Reviews Page Empty State**
+  - [ ] Check if reviews array is empty
+  - [ ] Show Star icon
+  - [ ] Show "No reviews yet" heading
+  - [ ] Add helpful description
+  - [ ] Add "View Products" button
+  - [ ] Remove any hardcoded/fake reviews
+
+- [ ] **Media Page Empty State**
+  - [ ] Check if media array is empty
+  - [ ] Show ImageIcon
+  - [ ] Show "No images uploaded yet" heading
+  - [ ] Add "Upload Your First Image" button
+  - [ ] Remove any hardcoded/fake media
+
+- [ ] **Dashboard Empty State**
+  - [ ] Show empty state card when products.total === 0
+  - [ ] Add "Add Your First Product" CTA
+  - [ ] Always show Quick Actions section
 
 ---
 
