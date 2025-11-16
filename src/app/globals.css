@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 160 2% 25%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 160 2% 25%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 160 2% 25%;
+
+    --primary: 166 76% 37%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 120 1% 95%;
+    --secondary-foreground: 160 2% 25%;
+
+    --muted: 120 1% 95%;
+    --muted-foreground: 160 2% 45%;
+
+    --accent: 120 1% 95%;
+    --accent-foreground: 160 2% 25%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 76% 36%;
+    --warning: 38 92% 50%;
+    --info: 200 70% 50%;
+
+    --border: 120 1% 90%;
+    --input: 120 1% 90%;
+    --ring: 166 76% 37%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 160 5% 10%;
+    --foreground: 0 0% 95%;
+
+    --card: 160 5% 12%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 160 5% 12%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 166 76% 47%;
+    --primary-foreground: 0 0% 10%;
+
+    --secondary: 160 4% 18%;
+    --secondary-foreground: 0 0% 95%;
+
+    --muted: 160 4% 18%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 160 4% 18%;
+    --accent-foreground: 0 0% 95%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 95%;
+
+    --border: 160 4% 20%;
+    --input: 160 4% 20%;
+    --ring: 166 76% 47%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  h1 {
+    @apply text-3xl font-bold tracking-tight lg:text-4xl;
+  }
+  h2 {
+    @apply text-2xl font-semibold tracking-tight lg:text-3xl;
+  }
+  h3 {
+    @apply text-xl font-semibold lg:text-2xl;
+  }
+  h4 {
+    @apply text-lg font-semibold lg:text-xl;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+}
+

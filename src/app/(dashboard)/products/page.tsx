@@ -1,0 +1,269 @@
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+import { Plus, Search, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
+import { Button } from '@/presentation/components/ui/button'
+import { Input } from '@/presentation/components/ui/input'
+import { Badge } from '@/presentation/components/ui/badge'
+import { Card } from '@/presentation/components/ui/card'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/presentation/components/ui/table'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/presentation/components/ui/dropdown-menu'
+import { Skeleton } from '@/presentation/components/ui/skeleton'
+import { useProducts } from '@/presentation/hooks/use-products'
+import { formatCurrency } from '@/shared/utils/format'
+import { ROUTES } from '@/infrastructure/config/constants'
+
+export default function ProductsPage() {
+  const [searchQuery, setSearchQuery] = useState('')
+  const { products, loading, deleteProduct } = useProducts({ search: searchQuery })
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Are you sure you want to delete this product?')) {
+      await deleteProduct(id)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <Skeleton className="h-10 w-48" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <Card>
+          <div className="p-6 space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <Skeleton key={i} className="h-16 w-full" />
+            ))}
+          </div>
+        </Card>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold">Products</h1>
+          <p className="text-muted-foreground mt-2">Manage your product inventory</p>
+        </div>
+        <Link href={ROUTES.PRODUCTS_NEW}>
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Add New Product
+          </Button>
+        </Link>
+      </div>
+
+      <Card className="p-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </Card>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block">
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Product</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Stock</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {products.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    No products found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                products.map((product) => (
+                  <TableRow key={product._id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        {product.images[0]?.url && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={product.images[0].url}
+                            alt={product.name}
+                            className="h-10 w-10 rounded object-cover"
+                          />
+                        )}
+                        <div>
+                          <p className="font-medium">{product.name}</p>
+                          <p className="text-sm text-muted-foreground">{product.sku}</p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {typeof product.category === 'string' ? product.category : product.category.name}
+                    </TableCell>
+                    <TableCell>{formatCurrency(product.price)}</TableCell>
+                    <TableCell>
+                      <span
+                        className={
+                          product.stock <= product.lowStockThreshold
+                            ? 'text-destructive font-medium'
+                            : ''
+                        }
+                      >
+                        {product.stock}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          product.status === 'active'
+                            ? 'success'
+                            : product.status === 'inactive'
+                            ? 'secondary'
+                            : 'outline'
+                        }
+                      >
+                        {product.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem asChild>
+                            <Link href={ROUTES.PRODUCTS_EDIT(product._id)}>
+                              <Pencil className="h-4 w-4 mr-2" />
+                              Edit
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleDelete(product._id)}
+                            className="text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </Card>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-4">
+        {products.length === 0 ? (
+          <Card className="p-8 text-center text-muted-foreground">
+            No products found
+          </Card>
+        ) : (
+          products.map((product) => (
+            <Card key={product._id} className="p-4">
+              <div className="flex gap-4">
+                {product.images[0]?.url && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={product.images[0].url}
+                    alt={product.name}
+                    className="h-20 w-20 rounded object-cover"
+                  />
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h3 className="font-medium">{product.name}</h3>
+                      <p className="text-sm text-muted-foreground">{product.sku}</p>
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                          <Link href={ROUTES.PRODUCTS_EDIT(product._id)}>
+                            <Pencil className="h-4 w-4 mr-2" />
+                            Edit
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleDelete(product._id)}
+                          className="text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                  <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
+                    <div>
+                      <span className="text-muted-foreground">Price: </span>
+                      <span className="font-medium">{formatCurrency(product.price)}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Stock: </span>
+                      <span
+                        className={
+                          product.stock <= product.lowStockThreshold
+                            ? 'text-destructive font-medium'
+                            : 'font-medium'
+                        }
+                      >
+                        {product.stock}
+                      </span>
+                    </div>
+                    <Badge
+                      variant={
+                        product.status === 'active'
+                          ? 'success'
+                          : product.status === 'inactive'
+                          ? 'secondary'
+                          : 'outline'
+                      }
+                    >
+                      {product.status}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ))
+        )}
+      </div>
+    </div>
+  )
+}
+
