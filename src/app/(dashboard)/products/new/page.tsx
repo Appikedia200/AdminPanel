@@ -1,68 +1,151 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, Save, Loader2 } from 'lucide-react'
+import { ArrowLeft, Save, Loader2, Upload, X, Image as ImageIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/presentation/components/ui/button'
 import { Input } from '@/presentation/components/ui/input'
 import { Label } from '@/presentation/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/card'
-import { productSchema, type ProductFormData } from '@/presentation/validators/product.schema'
-import { ProductRepositoryImpl } from '@/infrastructure/repositories/product.repository.impl'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/presentation/components/ui/select'
+import { httpClient } from '@/infrastructure/api/client'
+import { API_ENDPOINTS } from '@/infrastructure/config/api.config'
+import { useCategories } from '@/presentation/hooks/use-categories'
+import { useImageUpload, type UploadedImage } from '@/presentation/hooks/use-image-upload'
 import { toast } from 'sonner'
 import { ROUTES } from '@/infrastructure/config/constants'
 
 export default function NewProductPage() {
   const router = useRouter()
+  const { categories, loading: categoriesLoading } = useCategories()
+  const { uploadMultipleImages, uploading } = useImageUpload()
+  
   const [loading, setLoading] = useState(false)
-  const repository = new ProductRepositoryImpl()
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-  } = useForm<ProductFormData>({
-    resolver: zodResolver(productSchema),
-    defaultValues: {
-      status: 'draft',
-      featured: false,
-      stock: 0,
-      lowStockThreshold: 10,
-      images: [],
-    },
+  const [images, setImages] = useState<UploadedImage[]>([])
+  const [formData, setFormData] = useState({
+    name: '',
+    slug: '',
+    description: '',
+    shortDescription: '',
+    price: '',
+    salePrice: '',
+    costPrice: '',
+    sku: '',
+    stock: '',
+    lowStockThreshold: '10',
+    category: '',
+    keywords: '',
+    ingredients: '',
+    status: 'draft' as 'draft' | 'active' | 'inactive',
   })
 
-  const onSubmit = async (data: ProductFormData) => {
-    try {
-      setLoading(true)
-      await repository.create(data)
-      toast.success('Product created successfully')
-      router.push(ROUTES.PRODUCTS)
-    } catch (error) {
-      toast.error('Failed to create product')
-      console.error(error)
-    } finally {
-      setLoading(false)
+  // Auto-generate slug from name
+  useEffect(() => {
+    if (formData.name && !formData.slug) {
+      const slug = formData.name
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_-]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+      setFormData({ ...formData, slug })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.name])
+
+  const handleChange = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value })
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    const fileArray = Array.from(files)
+    const uploadedImages = await uploadMultipleImages(fileArray)
+    
+    if (uploadedImages.length > 0) {
+      setImages([...images, ...uploadedImages])
+      toast.success(`${uploadedImages.length} image(s) uploaded successfully`)
     }
   }
 
-  const generateSlug = (name: string) => {
-    return name
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_-]+/g, '-')
-      .replace(/^-+|-+$/g, '')
+  const handleRemoveImage = (index: number) => {
+    setImages(images.filter((_, i) => i !== index))
   }
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.value
-    setValue('name', name)
-    setValue('slug', generateSlug(name))
+  const handleSetDefaultImage = (index: number) => {
+    setImages(images.map((img, i) => ({ ...img, isDefault: i === index })))
+  }
+
+  const handleGenerateSKU = async () => {
+    try {
+      const response: any = await httpClient.post(API_ENDPOINTS.products.generateSKU, {
+        categoryId: formData.category || undefined,
+      })
+      
+      if (response.success && response.data?.sku) {
+        setFormData({ ...formData, sku: response.data.sku })
+        toast.success('SKU generated')
+      }
+    } catch (error: any) {
+      toast.error(error.error || 'Failed to generate SKU')
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    // Validation
+    if (!formData.name || !formData.description || !formData.price || !formData.sku || !formData.category) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+
+    if (images.length === 0) {
+      toast.error('Please upload at least one product image')
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      const payload = {
+        name: formData.name,
+        slug: formData.slug,
+        description: {
+          full: formData.description,
+          short: formData.shortDescription || formData.description.substring(0, 160),
+        },
+        price: parseFloat(formData.price),
+        salePrice: formData.salePrice ? parseFloat(formData.salePrice) : undefined,
+        costPrice: formData.costPrice ? parseFloat(formData.costPrice) : undefined,
+        sku: formData.sku,
+        stock: parseInt(formData.stock) || 0,
+        lowStockThreshold: parseInt(formData.lowStockThreshold) || 10,
+        category: formData.category,
+        images: images.map((img) => ({
+          url: img.url,
+          altText: img.altText || formData.name,
+          isDefault: img.isDefault,
+        })),
+        keywords: formData.keywords ? formData.keywords.split(',').map((k) => k.trim()) : [],
+        ingredients: formData.ingredients ? formData.ingredients.split(',').map((i) => i.trim()) : [],
+        status: formData.status,
+      }
+
+      const response: any = await httpClient.post(API_ENDPOINTS.products.create, payload)
+      
+      if (response.success) {
+        toast.success('Product created successfully')
+        router.push(ROUTES.PRODUCTS)
+      }
+    } catch (error: any) {
+      toast.error(error.error || 'Failed to create product')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -79,7 +162,7 @@ export default function NewProductPage() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information */}
         <Card>
           <CardHeader>
@@ -91,25 +174,22 @@ export default function NewProductPage() {
                 <Label htmlFor="name">Product Name *</Label>
                 <Input
                   id="name"
-                  {...register('name')}
-                  onChange={handleNameChange}
+                  value={formData.name}
+                  onChange={(e) => handleChange('name', e.target.value)}
                   placeholder="e.g., Vitamin C Serum"
+                  required
                 />
-                {errors.name && (
-                  <p className="text-sm text-destructive">{errors.name.message}</p>
-                )}
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="slug">URL Slug *</Label>
                 <Input
                   id="slug"
-                  {...register('slug')}
+                  value={formData.slug}
+                  onChange={(e) => handleChange('slug', e.target.value)}
                   placeholder="vitamin-c-serum"
+                  required
                 />
-                {errors.slug && (
-                  <p className="text-sm text-destructive">{errors.slug.message}</p>
-                )}
               </div>
             </div>
 
@@ -117,24 +197,121 @@ export default function NewProductPage() {
               <Label htmlFor="description">Description *</Label>
               <textarea
                 id="description"
-                {...register('description')}
+                value={formData.description}
+                onChange={(e) => handleChange('description', e.target.value)}
                 rows={4}
-                className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 placeholder="Detailed product description..."
+                required
               />
-              {errors.description && (
-                <p className="text-sm text-destructive">{errors.description.message}</p>
-              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="shortDescription">Short Description</Label>
               <Input
                 id="shortDescription"
-                {...register('shortDescription')}
+                value={formData.shortDescription}
+                onChange={(e) => handleChange('shortDescription', e.target.value)}
                 placeholder="Brief description for listings"
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="keywords">Keywords (comma-separated)</Label>
+              <Input
+                id="keywords"
+                value={formData.keywords}
+                onChange={(e) => handleChange('keywords', e.target.value)}
+                placeholder="vitamin c, serum, brightening"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="ingredients">Ingredients (comma-separated)</Label>
+              <Input
+                id="ingredients"
+                value={formData.ingredients}
+                onChange={(e) => handleChange('ingredients', e.target.value)}
+                placeholder="Water, Vitamin C, Hyaluronic Acid"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Images */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Product Images *</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="images">Upload Images</Label>
+              <div className="flex items-center gap-4">
+                <Input
+                  id="images"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageUpload}
+                  disabled={uploading}
+                  className="cursor-pointer"
+                />
+                <Button type="button" disabled={uploading} variant="outline">
+                  <Upload className="h-4 w-4 mr-2" />
+                  {uploading ? 'Uploading...' : 'Upload'}
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Upload product images (JPEG, PNG, WebP). First image will be the default.
+              </p>
+            </div>
+
+            {images.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {images.map((image, index) => (
+                  <div key={index} className="relative group border rounded-lg p-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={image.url}
+                      alt={image.altText}
+                      className="w-full h-32 object-cover rounded"
+                    />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                      {!image.isDefault && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => handleSetDefaultImage(index)}
+                        >
+                          Set Default
+                        </Button>
+                      )}
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleRemoveImage(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    {image.isDefault && (
+                      <div className="absolute top-3 left-3 bg-primary text-primary-foreground text-xs px-2 py-1 rounded">
+                        Default
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {images.length === 0 && (
+              <div className="border-2 border-dashed rounded-lg p-12 text-center">
+                <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">No images uploaded yet</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -151,12 +328,11 @@ export default function NewProductPage() {
                   id="price"
                   type="number"
                   step="0.01"
-                  {...register('price', { valueAsNumber: true })}
+                  value={formData.price}
+                  onChange={(e) => handleChange('price', e.target.value)}
                   placeholder="0.00"
+                  required
                 />
-                {errors.price && (
-                  <p className="text-sm text-destructive">{errors.price.message}</p>
-                )}
               </div>
 
               <div className="space-y-2">
@@ -165,7 +341,8 @@ export default function NewProductPage() {
                   id="salePrice"
                   type="number"
                   step="0.01"
-                  {...register('salePrice', { valueAsNumber: true })}
+                  value={formData.salePrice}
+                  onChange={(e) => handleChange('salePrice', e.target.value)}
                   placeholder="0.00"
                 />
               </div>
@@ -176,7 +353,8 @@ export default function NewProductPage() {
                   id="costPrice"
                   type="number"
                   step="0.01"
-                  {...register('costPrice', { valueAsNumber: true })}
+                  value={formData.costPrice}
+                  onChange={(e) => handleChange('costPrice', e.target.value)}
                   placeholder="0.00"
                 />
               </div>
@@ -193,14 +371,22 @@ export default function NewProductPage() {
             <div className="grid gap-4 md:grid-cols-3">
               <div className="space-y-2">
                 <Label htmlFor="sku">SKU *</Label>
-                <Input
-                  id="sku"
-                  {...register('sku')}
-                  placeholder="PROD-001"
-                />
-                {errors.sku && (
-                  <p className="text-sm text-destructive">{errors.sku.message}</p>
-                )}
+                <div className="flex gap-2">
+                  <Input
+                    id="sku"
+                    value={formData.sku}
+                    onChange={(e) => handleChange('sku', e.target.value)}
+                    placeholder="PROD-001"
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleGenerateSKU}
+                  >
+                    Generate
+                  </Button>
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -208,12 +394,11 @@ export default function NewProductPage() {
                 <Input
                   id="stock"
                   type="number"
-                  {...register('stock', { valueAsNumber: true })}
+                  value={formData.stock}
+                  onChange={(e) => handleChange('stock', e.target.value)}
                   placeholder="0"
+                  required
                 />
-                {errors.stock && (
-                  <p className="text-sm text-destructive">{errors.stock.message}</p>
-                )}
               </div>
 
               <div className="space-y-2">
@@ -221,7 +406,8 @@ export default function NewProductPage() {
                 <Input
                   id="lowStockThreshold"
                   type="number"
-                  {...register('lowStockThreshold', { valueAsNumber: true })}
+                  value={formData.lowStockThreshold}
+                  onChange={(e) => handleChange('lowStockThreshold', e.target.value)}
                   placeholder="10"
                 />
               </div>
@@ -237,17 +423,52 @@ export default function NewProductPage() {
           <CardContent>
             <div className="space-y-2">
               <Label htmlFor="category">Select Category</Label>
-              <Input
-                id="category"
-                {...register('category')}
-                placeholder="Category ID (e.g., 6572f8b9c3d4e5f6a7b8c9d0)"
-              />
-              {errors.category && (
-                <p className="text-sm text-destructive">{errors.category.message}</p>
+              <Select
+                value={formData.category}
+                onValueChange={(value) => handleChange('category', value)}
+                disabled={categoriesLoading}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={categoriesLoading ? 'Loading categories...' : 'Select a category'} />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category._id} value={category._id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {categories.length === 0 && !categoriesLoading && (
+                <p className="text-sm text-destructive">
+                  No categories found. Please create a category first.
+                </p>
               )}
-              <p className="text-sm text-muted-foreground">
-                Enter the category ID from the Categories page
-              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Status */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Status</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Label htmlFor="status">Product Status</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value: 'draft' | 'active' | 'inactive') => handleChange('status', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
         </Card>
@@ -259,7 +480,7 @@ export default function NewProductPage() {
               Cancel
             </Button>
           </Link>
-          <Button type="submit" disabled={loading}>
+          <Button type="submit" disabled={loading || uploading}>
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

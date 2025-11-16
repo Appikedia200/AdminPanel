@@ -1,16 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { Sparkles } from 'lucide-react'
 import { Button } from '@/presentation/components/ui/button'
 import { Input } from '@/presentation/components/ui/input'
 import { Label } from '@/presentation/components/ui/label'
-import { Card } from '@/presentation/components/ui/card'
-import { Sparkles } from 'lucide-react'
-import { toast } from 'sonner'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/presentation/components/ui/card'
 import { httpClient } from '@/infrastructure/api/client'
 import { API_ENDPOINTS } from '@/infrastructure/config/api.config'
+import { toast } from 'sonner'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -25,6 +25,7 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    // Client-side validation
     if (formData.password !== formData.confirmPassword) {
       toast.error('Passwords do not match')
       return
@@ -45,11 +46,17 @@ export default function RegisterPage() {
       })
 
       if (response.success) {
-        toast.success('Account created successfully! Please check your email to verify.')
-        router.push('/login')
+        // Show success message
+        toast.success('Account created! Check your email for verification code.')
+        
+        // Store email for verification page
+        sessionStorage.setItem('verification_email', formData.email)
+        
+        // Redirect to verification page
+        router.push('/verify-email')
       }
     } catch (error: any) {
-      toast.error(error.error || 'Registration failed')
+      toast.error(error.error || 'Registration failed. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -60,16 +67,19 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent p-4">
-      <Card className="w-full max-w-md p-8">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-            <Sparkles className="w-8 h-8 text-primary" />
+    <Card>
+      <CardHeader className="space-y-4 text-center">
+        <div className="flex justify-center">
+          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+            <Sparkles className="h-6 w-6 text-primary" />
           </div>
-          <h1 className="text-2xl font-bold">Create Admin Account</h1>
-          <p className="text-muted-foreground mt-2">Sign up to manage GlowNatura</p>
         </div>
-
+        <div className="space-y-2">
+          <CardTitle className="text-2xl">Create Admin Account</CardTitle>
+          <CardDescription>Sign up to manage GlowNatura</CardDescription>
+        </div>
+      </CardHeader>
+      <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>
@@ -79,6 +89,7 @@ export default function RegisterPage() {
               value={formData.name}
               onChange={(e) => handleChange('name', e.target.value)}
               placeholder="John Doe"
+              disabled={loading}
               required
             />
           </div>
@@ -91,6 +102,7 @@ export default function RegisterPage() {
               value={formData.email}
               onChange={(e) => handleChange('email', e.target.value)}
               placeholder="admin@glownatura.com"
+              disabled={loading}
               required
             />
           </div>
@@ -103,6 +115,7 @@ export default function RegisterPage() {
               value={formData.password}
               onChange={(e) => handleChange('password', e.target.value)}
               placeholder="At least 6 characters"
+              disabled={loading}
               required
             />
           </div>
@@ -115,6 +128,7 @@ export default function RegisterPage() {
               value={formData.confirmPassword}
               onChange={(e) => handleChange('confirmPassword', e.target.value)}
               placeholder="Re-enter your password"
+              disabled={loading}
               required
             />
           </div>
@@ -132,8 +146,7 @@ export default function RegisterPage() {
             </Link>
           </p>
         </div>
-      </Card>
-    </div>
+      </CardContent>
+    </Card>
   )
 }
-

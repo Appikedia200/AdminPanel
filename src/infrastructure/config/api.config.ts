@@ -1,7 +1,5 @@
-import { API_BASE_URL } from './constants'
-
 export const API_CONFIG = {
-  baseURL: API_BASE_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://backendglownaturas.onrender.com',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -9,18 +7,21 @@ export const API_CONFIG = {
 } as const
 
 export const API_ENDPOINTS = {
+  // Authentication
   auth: {
     login: '/api/auth/login',
     logout: '/api/auth/logout',
     me: '/api/auth/me',
     register: '/api/auth/register',
     verifyEmail: '/api/auth/verify-email',
+    verifyOtp: '/api/auth/verify-otp',
     forgotPassword: '/api/auth/forgot-password',
     resetPassword: '/api/auth/reset-password',
     changePassword: '/api/auth/change-password',
     updateProfile: '/api/auth/profile',
   },
 
+  // Products
   products: {
     list: '/api/products',
     create: '/api/products',
@@ -32,6 +33,7 @@ export const API_ENDPOINTS = {
     bulkStatus: '/api/products/bulk/status',
   },
 
+  // Categories
   categories: {
     list: '/api/categories',
     create: '/api/categories',
@@ -41,6 +43,7 @@ export const API_ENDPOINTS = {
     reorder: '/api/categories/reorder',
   },
 
+  // Reviews
   reviews: {
     list: '/api/reviews',
     get: (id: string) => `/api/reviews/${id}`,
@@ -50,6 +53,7 @@ export const API_ENDPOINTS = {
     bulkStatus: '/api/reviews/bulk/status',
   },
 
+  // Orders
   orders: {
     list: '/api/orders',
     get: (id: string) => `/api/orders/${id}`,
@@ -63,6 +67,7 @@ export const API_ENDPOINTS = {
     refundProcess: (id: string) => `/api/orders/${id}/refund/process`,
   },
 
+  // Media
   media: {
     list: '/api/media',
     get: (id: string) => `/api/media/${id}`,
@@ -72,13 +77,21 @@ export const API_ENDPOINTS = {
     bulkDeleteUnused: '/api/media/bulk/unused',
   },
 
+  // Settings
   settings: {
     get: '/api/settings',
     update: '/api/settings',
   },
 
+  // Email Templates
+  emailTemplates: {
+    list: '/api/email-templates',
+    get: (type: string) => `/api/email-templates/${type}`,
+    update: (id: string) => `/api/email-templates/${id}`,
+  },
+
+  // Dashboard
   dashboard: {
     stats: '/api/dashboard/stats',
   },
 } as const
-
