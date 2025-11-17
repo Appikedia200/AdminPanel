@@ -46,16 +46,50 @@ export default function RegisterPage() {
       })
 
       if (response.success) {
-        // Show success message
-        toast.success('Account created! Check your email for the verification link.', {
-          duration: 5000
+        // Show clear success message
+        toast.success('✅ Account created successfully!', {
+          description: 'Check your email for the verification link to activate your account.',
+          duration: 6000
         })
         
-        // Redirect to login page
-        router.push('/login')
+        // Small delay before redirect to ensure user sees the message
+        setTimeout(() => {
+          router.push('/login')
+        }, 1500)
       }
     } catch (error: any) {
-      toast.error(error.error || 'Registration failed. Please try again.')
+      // Handle specific error cases
+      if (error.errorCode === 'EMAIL_ALREADY_EXISTS' || error.error?.includes('already exists')) {
+        toast.error('Email already registered', {
+          description: 'This email is already in use. Try logging in or use a different email.',
+          duration: 5000
+        })
+      } else if (error.errorCode === 'INVALID_EMAIL') {
+        toast.error('Invalid email address', {
+          description: 'Please provide a valid email address.',
+          duration: 4000
+        })
+      } else if (error.errorCode === 'WEAK_PASSWORD') {
+        toast.error('Password too weak', {
+          description: 'Password must be at least 6 characters long.',
+          duration: 4000
+        })
+      } else if (error.errorCode === 'EMAIL_SERVICE_ERROR') {
+        toast.error('Registration successful, but email failed', {
+          description: 'Your account was created but we could not send the verification email. Please contact support.',
+          duration: 7000
+        })
+      } else if (error.errorCode === 'NETWORK_ERROR') {
+        toast.error('Connection failed', {
+          description: 'Please check your internet connection and try again.',
+          duration: 5000
+        })
+      } else {
+        toast.error('Registration failed', {
+          description: error.error || 'Something went wrong. Please try again.',
+          duration: 5000
+        })
+      }
     } finally {
       setLoading(false)
     }

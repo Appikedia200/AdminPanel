@@ -27,10 +27,33 @@ export default function ForgotPasswordPage() {
 
       if (response.success) {
         setSubmitted(true)
-        toast.success('Password reset link sent to your email')
+        toast.success('Reset link sent!', {
+          description: 'Check your email for password reset instructions.',
+          duration: 5000
+        })
       }
     } catch (error: any) {
-      toast.error(error.error || 'Failed to send reset link')
+      if (error.errorCode === 'USER_NOT_FOUND' || error.error?.includes('not found')) {
+        toast.error('Email not found', {
+          description: 'No account exists with this email address.',
+          duration: 5000
+        })
+      } else if (error.errorCode === 'EMAIL_SERVICE_ERROR') {
+        toast.error('Email service unavailable', {
+          description: 'Unable to send reset link at this time. Please try again later.',
+          duration: 6000
+        })
+      } else if (error.errorCode === 'NETWORK_ERROR') {
+        toast.error('Connection failed', {
+          description: 'Please check your internet connection and try again.',
+          duration: 5000
+        })
+      } else {
+        toast.error('Failed to send reset link', {
+          description: error.error || 'Something went wrong. Please try again.',
+          duration: 5000
+        })
+      }
     } finally {
       setLoading(false)
     }

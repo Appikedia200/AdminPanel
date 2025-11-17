@@ -1,58 +1,51 @@
 import { AxiosError } from 'axios'
-import { toast } from 'sonner'
 import Cookies from 'js-cookie'
 import { AUTH_TOKEN_KEY } from '../config/constants'
 
 interface ApiError {
   success: false
-  error: string
+  error?: string
+  message?: string
   errorCode?: string
 }
 
 export function handleApiError(error: AxiosError<ApiError>): never {
+  // Network error (no response from server)
   if (!error.response) {
-    toast.error('Network error. Please check your connection.')
-    throw error
+    const networkError = {
+      error: 'Network error. Please check your internet connection.',
+      errorCode: 'NETWORK_ERROR',
+      status: 0
+    }
+    throw networkError
   }
 
   const { status, data } = error.response
 
-  switch (status) {
-    case 401:
-      Cookies.remove(AUTH_TOKEN_KEY)
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login'
+  // Handle 401 Unauthorized - clear auth and redirect
+  if (status === 401) {
+    Cookies.remove(AUTH_TOKEN_KEY)
+    if (typeof window !== 'undefined') {
+      const currentPath = window.location.pathname
+      // Only redirect if not already on login/register pages
+      if (currentPath !== '/login' && currentPath !== '/register') {
+        setTimeout(() => {
+          window.location.href = '/login'
+        }, 100)
       }
-      toast.error('Session expired. Please login again.')
-      break
-
-    case 403:
-      toast.error('Access denied.')
-      break
-
-    case 404:
-      toast.error('Resource not found.')
-      break
-
-    case 422:
-      toast.error(data?.error || 'Validation error.')
-      break
-
-    case 429:
-      toast.error('Too many requests. Please try again later.')
-      break
-
-    case 500:
-    case 502:
-    case 503:
-    case 504:
-      toast.error('Server error. Please try again later.')
-      break
-
-    default:
-      toast.error(data?.error || 'An error occurred.')
+    }
   }
 
-  throw error
+  // Preserve backend error details
+  const errorMessage = data?.error || data?.message || 'An error occurred'
+  const errorCode = data?.errorCode || `HTTP_${status}`
+
+  // Throw structured error for the calling code to handle
+  throw {
+    error: errorMessage,
+    errorCode: errorCode,
+    status: status,
+    originalError: error
+  }
 }
 

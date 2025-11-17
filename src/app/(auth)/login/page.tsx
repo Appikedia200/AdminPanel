@@ -39,20 +39,40 @@ export default function LoginPage() {
       
       if (response.success && response.token) {
         Cookies.set(AUTH_TOKEN_KEY, response.token, { expires: 7 })
-        toast.success('Login successful!')
-        router.push('/')
+        toast.success('Welcome back!', {
+          description: 'Redirecting to dashboard...',
+          duration: 2000
+        })
+        setTimeout(() => {
+          router.push('/')
+        }, 500)
       }
     } catch (error: any) {
       if (error.errorCode === 'EMAIL_NOT_VERIFIED') {
-        toast.error('Please verify your email first. Check your inbox for the verification link.', { 
-          duration: 5000 
+        toast.error('Email not verified', {
+          description: 'Please check your inbox for the verification link to activate your account.',
+          duration: 6000
         })
       } else if (error.errorCode === 'ACCOUNT_LOCKED') {
-        toast.error('Account locked due to too many failed attempts. Please try again later.', { 
-          duration: 5000 
+        toast.error('Account locked', {
+          description: 'Too many failed login attempts. Please try again later or reset your password.',
+          duration: 6000
+        })
+      } else if (error.errorCode === 'INVALID_CREDENTIALS' || error.error?.includes('Invalid')) {
+        toast.error('Invalid credentials', {
+          description: 'The email or password you entered is incorrect.',
+          duration: 5000
+        })
+      } else if (error.errorCode === 'NETWORK_ERROR') {
+        toast.error('Connection failed', {
+          description: 'Please check your internet connection and try again.',
+          duration: 5000
         })
       } else {
-        toast.error(error.error || 'Invalid email or password')
+        toast.error('Login failed', {
+          description: error.error || 'Unable to sign in. Please try again.',
+          duration: 5000
+        })
       }
     } finally {
       setLoading(false)
