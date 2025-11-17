@@ -87,7 +87,10 @@ export const API_ENDPOINTS = {
   emailTemplates: {
     list: '/api/email-templates',
     get: (type: string) => `/api/email-templates/${type}`,
-    update: (id: string) => `/api/email-templates/${id}`,
+    update: (type: string) => `/api/email-templates/${type}`,
+    preview: '/api/email-templates/preview',
+    testSend: '/api/email-templates/test-send',
+    restore: (type: string) => `/api/email-templates/${type}/restore`,
   },
 
   // Dashboard

@@ -7,6 +7,7 @@ import { Button } from '@/presentation/components/ui/button'
 import { Input } from '@/presentation/components/ui/input'
 import { Badge } from '@/presentation/components/ui/badge'
 import { Card } from '@/presentation/components/ui/card'
+import { Checkbox } from '@/presentation/components/ui/checkbox'
 import {
   Table,
   TableBody,
@@ -25,14 +26,57 @@ import { Skeleton } from '@/presentation/components/ui/skeleton'
 import { useProducts } from '@/presentation/hooks/use-products'
 import { formatCurrency } from '@/shared/utils/format'
 import { ROUTES } from '@/infrastructure/config/constants'
+import { httpClient } from '@/infrastructure/api/client'
+import { API_ENDPOINTS } from '@/infrastructure/config/api.config'
+import { toast } from 'sonner'
 
 export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState('')
-  const { products, loading, deleteProduct } = useProducts({ search: searchQuery })
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([])
+  const [bulkUpdating, setBulkUpdating] = useState(false)
+  const { products, loading, deleteProduct, refetch } = useProducts({ search: searchQuery })
 
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this product?')) {
       await deleteProduct(id)
+    }
+  }
+
+  const handleBulkStatusUpdate = async (status: 'active' | 'inactive') => {
+    if (!confirm(`${status === 'active' ? 'Activate' : 'Deactivate'} ${selectedProducts.length} products?`)) {
+      return
+    }
+
+    setBulkUpdating(true)
+    try {
+      await httpClient.put(API_ENDPOINTS.products.bulkStatus, {
+        productIds: selectedProducts,
+        status
+      })
+      
+      toast.success(`${selectedProducts.length} products ${status === 'active' ? 'activated' : 'deactivated'}`)
+      setSelectedProducts([])
+      refetch()
+    } catch (error: any) {
+      toast.error(error.error || 'Failed to update products')
+    } finally {
+      setBulkUpdating(false)
+    }
+  }
+
+  const toggleProductSelection = (productId: string) => {
+    setSelectedProducts(prev =>
+      prev.includes(productId)
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
+    )
+  }
+
+  const toggleSelectAll = () => {
+    if (selectedProducts.length === products.length && products.length > 0) {
+      setSelectedProducts([])
+    } else {
+      setSelectedProducts(products.map(p => p._id))
     }
   }
 
@@ -87,6 +131,12 @@ export default function ProductsPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-12">
+                  <Checkbox
+                    checked={selectedProducts.length === products.length && products.length > 0}
+                    onCheckedChange={toggleSelectAll}
+                  />
+                </TableHead>
                 <TableHead>Product</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Price</TableHead>
@@ -98,13 +148,19 @@ export default function ProductsPage() {
             <TableBody>
               {products.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                     No products found
                   </TableCell>
                 </TableRow>
               ) : (
                 products.map((product) => (
                   <TableRow key={product._id}>
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedProducts.includes(product._id)}
+                        onCheckedChange={() => toggleProductSelection(product._id)}
+                      />
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         {product.images[0]?.url && (
@@ -263,6 +319,40 @@ export default function ProductsPage() {
           ))
         )}
       </div>
+
+      {/* Bulk Action Toolbar */}
+      {selectedProducts.length > 0 && (
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground px-6 py-3 rounded-lg shadow-lg flex items-center gap-4 z-50">
+          <span className="font-medium">{selectedProducts.length} product{selectedProducts.length > 1 ? 's' : ''} selected</span>
+          
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => handleBulkStatusUpdate('active')}
+            disabled={bulkUpdating}
+          >
+            Activate
+          </Button>
+          
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => handleBulkStatusUpdate('inactive')}
+            disabled={bulkUpdating}
+          >
+            Deactivate
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSelectedProducts([])}
+            className="hover:bg-primary-foreground/10"
+          >
+            Cancel
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

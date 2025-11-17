@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Search, Eye } from 'lucide-react'
+import { Search, Eye, Download } from 'lucide-react'
+import Cookies from 'js-cookie'
 import { Button } from '@/presentation/components/ui/button'
 import { Input } from '@/presentation/components/ui/input'
 import { Card } from '@/presentation/components/ui/card'
@@ -19,10 +20,12 @@ import { Skeleton } from '@/presentation/components/ui/skeleton'
 import { useOrders } from '@/presentation/hooks/use-orders'
 import { formatCurrency, formatDate } from '@/shared/utils/format'
 import { ROUTES } from '@/infrastructure/config/constants'
+import { toast } from 'sonner'
 
 export default function OrdersPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [exporting, setExporting] = useState(false)
   
   const params = {
     search: searchQuery,
@@ -44,6 +47,49 @@ export default function OrdersPage() {
     return 'warning'
   }
 
+  const handleExportOrders = async () => {
+    setExporting(true)
+    const loadingToast = toast.loading('Preparing export...')
+    
+    try {
+      const token = Cookies.get('auth_token')
+      
+      const queryParams = new URLSearchParams({
+        ...(statusFilter !== 'all' && { status: statusFilter }),
+        ...(searchQuery && { search: searchQuery })
+      })
+      
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://backendglownaturas.onrender.com'}/api/orders/export?${queryParams}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      )
+      
+      if (!response.ok) throw new Error('Export failed')
+      
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `orders-export-${new Date().toISOString().split('T')[0]}.csv`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
+      
+      toast.dismiss(loadingToast)
+      toast.success('Orders exported successfully')
+    } catch {
+      toast.dismiss(loadingToast)
+      toast.error('Failed to export orders')
+    } finally {
+      setExporting(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -59,9 +105,15 @@ export default function OrdersPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Orders</h1>
-        <p className="text-muted-foreground mt-2">Manage customer orders</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold">Orders</h1>
+          <p className="text-muted-foreground mt-2">Manage customer orders</p>
+        </div>
+        <Button onClick={handleExportOrders} variant="outline" disabled={exporting || orders.length === 0}>
+          <Download className="mr-2 h-4 w-4" />
+          {exporting ? 'Exporting...' : 'Export to CSV'}
+        </Button>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4">
