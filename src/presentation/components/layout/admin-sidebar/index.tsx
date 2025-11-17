@@ -5,12 +5,13 @@ import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Package, FolderTree, Star, ShoppingCart, Image, Settings, Sparkles } from 'lucide-react'
 import { cn } from '@/shared/utils/cn'
 import { Separator } from '@/presentation/components/ui/separator'
+import { usePendingReviewsCount } from '@/presentation/hooks/use-pending-reviews-count'
 
 const menuItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/products', label: 'Products', icon: Package },
   { href: '/categories', label: 'Categories', icon: FolderTree },
-  { href: '/reviews', label: 'Reviews', icon: Star, badge: 12 },
+  { href: '/reviews', label: 'Reviews', icon: Star, badgeKey: 'reviews' },
   { href: '/orders', label: 'Orders', icon: ShoppingCart },
   { href: '/media', label: 'Media', icon: Image },
   { href: '/settings', label: 'Settings', icon: Settings },
@@ -22,6 +23,12 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ onNavigate }: AdminSidebarProps) {
   const pathname = usePathname()
+  const { count: pendingReviewsCount } = usePendingReviewsCount()
+  
+  const getBadgeValue = (item: typeof menuItems[0]) => {
+    if (item.badgeKey === 'reviews') return pendingReviewsCount
+    return null
+  }
 
   return (
     <div className="flex h-full flex-col gap-2">
@@ -49,11 +56,14 @@ export function AdminSidebar({ onNavigate }: AdminSidebarProps) {
               >
                 <Icon className="h-4 w-4" />
                 {item.label}
-                {item.badge && (
-                  <span className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
-                    {item.badge}
-                  </span>
-                )}
+                {(() => {
+                  const badgeValue = getBadgeValue(item)
+                  return badgeValue !== null && badgeValue > 0 && (
+                    <span className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+                      {badgeValue}
+                    </span>
+                  )
+                })()}
               </Link>
             )
           })}

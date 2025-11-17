@@ -26,11 +26,16 @@ export const ROUTES = {
   PRODUCTS: '/products',
   PRODUCTS_NEW: '/products/new',
   PRODUCTS_EDIT: (id: string) => `/products/${id}/edit`,
+  PRODUCTS_LOW_STOCK: '/products/low-stock',
   CATEGORIES: '/categories',
   REVIEWS: '/reviews',
   ORDERS: '/orders',
   ORDERS_DETAIL: (id: string) => `/orders/${id}`,
   MEDIA: '/media',
   SETTINGS: '/settings',
+  SETTINGS_WHATSAPP: '/settings/whatsapp',
+  SETTINGS_SOCIAL: '/settings/social',
+  SETTINGS_SHIPPING: '/settings/shipping',
+  EMAIL_TEMPLATES: '/settings/email-templates',
 } as const
 

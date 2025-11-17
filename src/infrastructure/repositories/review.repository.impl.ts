@@ -17,15 +17,15 @@ export class ReviewRepositoryImpl implements IReviewRepository {
   }
 
   async updateStatus(id: string, status: ReviewStatus): Promise<ApiResponse<Review>> {
-    return httpClient.patch<ApiResponse<Review>>(API_ENDPOINTS.reviews.updateStatus(id), { status })
+    return httpClient.put<ApiResponse<Review>>(API_ENDPOINTS.reviews.updateStatus(id), { status })
   }
 
   async delete(id: string): Promise<ApiResponse<void>> {
     return httpClient.delete<ApiResponse<void>>(API_ENDPOINTS.reviews.delete(id))
   }
 
-  async bulkUpdateStatus(ids: string[], status: ReviewStatus): Promise<ApiResponse<void>> {
-    return httpClient.post<ApiResponse<void>>(API_ENDPOINTS.reviews.bulkStatus, { ids, status })
+  async bulkUpdateStatus(reviewIds: string[], status: ReviewStatus): Promise<ApiResponse<void>> {
+    return httpClient.put<ApiResponse<void>>(API_ENDPOINTS.reviews.bulkStatus, { reviewIds, status })
   }
 }
 

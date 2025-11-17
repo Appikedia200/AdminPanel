@@ -16,16 +16,23 @@ export class OrderRepositoryImpl implements IOrderRepository {
     return httpClient.get<ApiResponse<Order>>(API_ENDPOINTS.orders.get(id))
   }
 
-  async updateStatus(id: string, status: OrderStatus): Promise<ApiResponse<Order>> {
-    return httpClient.patch<ApiResponse<Order>>(API_ENDPOINTS.orders.updateStatus(id), { status })
+  async updateStatus(id: string, status: OrderStatus, trackingNumber?: string): Promise<ApiResponse<Order>> {
+    const payload: any = { status }
+    if (trackingNumber) payload.trackingNumber = trackingNumber
+    return httpClient.put<ApiResponse<Order>>(API_ENDPOINTS.orders.updateStatus(id), payload)
   }
 
-  async confirmPayment(id: string): Promise<ApiResponse<Order>> {
-    return httpClient.post<ApiResponse<Order>>(API_ENDPOINTS.orders.confirmPayment(id))
+  async confirmPayment(id: string, paymentProof?: string): Promise<ApiResponse<Order>> {
+    const payload = paymentProof ? { paymentProof } : {}
+    return httpClient.put<ApiResponse<Order>>(API_ENDPOINTS.orders.confirmPayment(id), payload)
   }
 
   async cancel(id: string, reason: string): Promise<ApiResponse<Order>> {
-    return httpClient.post<ApiResponse<Order>>(API_ENDPOINTS.orders.cancel(id), { reason })
+    return httpClient.put<ApiResponse<Order>>(API_ENDPOINTS.orders.cancel(id), { reason })
+  }
+
+  async addNote(id: string, note: string): Promise<ApiResponse<Order>> {
+    return httpClient.post<ApiResponse<Order>>(API_ENDPOINTS.orders.addNote(id), { note })
   }
 }
 

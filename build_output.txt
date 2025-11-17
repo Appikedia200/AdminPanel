@@ -1,0 +1,109 @@
+
+> glownatura-admin@1.0.0 build
+> next build
+
+ ΓÜá Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\happy\package-lock.json as the root directory.
+ To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+ Detected additional lockfiles: 
+   * C:\Users\happy\OneDrive\Desktop\AdminGlowNaturas\package-lock.json
+
+   Γû▓ Next.js 15.5.6
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully in 21.2s
+   Linting and checking validity of types ...
+
+Failed to compile.
+
+./src/app/(auth)/forgot-password/page.tsx
+24:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+32:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/(auth)/login/page.tsx
+35:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+45:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/(auth)/register/page.tsx
+42:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+57:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/(auth)/verify-email/page.tsx
+22:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+32:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/(dashboard)/categories/page.tsx
+97:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+111:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/(dashboard)/media/page.tsx
+55:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+63:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+104:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/(dashboard)/orders/[id]/page.tsx
+54:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+64:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+84:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+89:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+100:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+115:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+125:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+141:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+149:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/(dashboard)/products/low-stock/page.tsx
+36:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+41:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/(dashboard)/products/new/page.tsx
+84:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+92:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+138:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+144:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/(dashboard)/products/[id]/edit/page.tsx
+52:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+76:60  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+85:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+125:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+133:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+179:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+185:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/(dashboard)/settings/page.tsx
+89:6  Warning: React Hook useEffect has a missing dependency: 'fetchSettings'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+93:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+116:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/infrastructure/repositories/order.repository.impl.ts
+20:20  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/presentation/components/ui/textarea.tsx
+5:18  Error: An interface declaring no members is equivalent to its supertype.  @typescript-eslint/no-empty-object-type
+
+./src/presentation/hooks/use-categories.ts
+18:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/presentation/hooks/use-dashboard-stats.ts
+41:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+46:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/presentation/hooks/use-dashboard.ts
+57:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+65:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+89:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+97:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+120:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+128:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+151:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+159:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/presentation/hooks/use-image-upload.ts
+25:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+29:43  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+47:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules

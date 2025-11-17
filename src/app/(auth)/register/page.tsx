@@ -47,13 +47,12 @@ export default function RegisterPage() {
 
       if (response.success) {
         // Show success message
-        toast.success('Account created! Check your email for verification code.')
+        toast.success('Account created! Check your email for the verification link.', {
+          duration: 5000
+        })
         
-        // Store email for verification page
-        sessionStorage.setItem('verification_email', formData.email)
-        
-        // Redirect to verification page
-        router.push('/verify-email')
+        // Redirect to login page
+        router.push('/login')
       }
     } catch (error: any) {
       toast.error(error.error || 'Registration failed. Please try again.')

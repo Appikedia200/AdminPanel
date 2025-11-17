@@ -14,7 +14,7 @@ export const API_ENDPOINTS = {
     me: '/api/auth/me',
     register: '/api/auth/register',
     verifyEmail: '/api/auth/verify-email',
-    verifyOtp: '/api/auth/verify-otp',
+    resendVerification: '/api/auth/resend-verification',
     forgotPassword: '/api/auth/forgot-password',
     resetPassword: '/api/auth/reset-password',
     changePassword: '/api/auth/change-password',
@@ -93,5 +93,8 @@ export const API_ENDPOINTS = {
   // Dashboard
   dashboard: {
     stats: '/api/dashboard/stats',
+    recentOrders: '/api/dashboard/recent-orders',
+    topProducts: '/api/dashboard/top-products',
+    salesData: '/api/dashboard/sales-data',
   },
 } as const
