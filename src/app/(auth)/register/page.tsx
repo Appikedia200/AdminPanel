@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/pre
 import { httpClient } from '@/infrastructure/api/client'
 import { API_ENDPOINTS } from '@/infrastructure/config/api.config'
 import { toast } from 'sonner'
+import type { RegisterResponse, ApiError } from '@/shared/types/api-responses'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -39,7 +40,7 @@ export default function RegisterPage() {
     setLoading(true)
 
     try {
-      const response: any = await httpClient.post(API_ENDPOINTS.auth.register, {
+      const response = await httpClient.post<RegisterResponse>(API_ENDPOINTS.auth.register, {
         name: formData.name,
         email: formData.email,
         password: formData.password,
@@ -57,7 +58,8 @@ export default function RegisterPage() {
           router.push('/login')
         }, 1500)
       }
-    } catch (error: any) {
+    } catch (err) {
+      const error = err as ApiError
       // Handle specific error cases
       if (error.errorCode === 'EMAIL_ALREADY_EXISTS' || error.error?.includes('already exists')) {
         toast.error('Email already registered', {

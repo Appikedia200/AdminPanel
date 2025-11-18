@@ -1,6 +1,6 @@
 export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'GlowNatura Admin'
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backendglownaturas.onrender.com'
 
 export const AUTH_TOKEN_KEY = 'auth_token'
 

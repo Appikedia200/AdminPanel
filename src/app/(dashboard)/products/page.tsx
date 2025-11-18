@@ -29,12 +29,18 @@ import { ROUTES } from '@/infrastructure/config/constants'
 import { httpClient } from '@/infrastructure/api/client'
 import { API_ENDPOINTS } from '@/infrastructure/config/api.config'
 import { toast } from 'sonner'
+import { Pagination } from '@/presentation/components/shared/pagination'
 
 export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedProducts, setSelectedProducts] = useState<string[]>([])
   const [bulkUpdating, setBulkUpdating] = useState(false)
-  const { products, loading, deleteProduct, refetch } = useProducts({ search: searchQuery })
+  const [currentPage, setCurrentPage] = useState(1)
+  const { products, pagination, loading, deleteProduct, refetch } = useProducts({ 
+    search: searchQuery,
+    page: currentPage,
+    limit: 20
+  })
 
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this product?')) {
@@ -319,6 +325,17 @@ export default function ProductsPage() {
           ))
         )}
       </div>
+
+      {/* Pagination */}
+      {pagination && pagination.totalPages > 1 && (
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          totalItems={pagination.total}
+          itemsPerPage={pagination.limit}
+          onPageChange={setCurrentPage}
+        />
+      )}
 
       {/* Bulk Action Toolbar */}
       {selectedProducts.length > 0 && (

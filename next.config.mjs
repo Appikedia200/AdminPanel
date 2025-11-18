@@ -1,7 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Note: For Cloudflare Pages deployment with dynamic routes,
+  // use their Node.js adapter instead of static export
+  // See: https://developers.cloudflare.com/pages/framework-guides/nextjs/
+  
   images: {
-    unoptimized: true,
+    unoptimized: true, // Cloudflare handles image optimization
     remotePatterns: [
       {
         protocol: 'https',
@@ -11,11 +15,11 @@ const nextConfig = {
   },
   
   typescript: {
-    ignoreBuildErrors: false,
+    ignoreBuildErrors: false, // Fail build on TypeScript errors
   },
   
   eslint: {
-    ignoreDuringBuilds: false,
+    ignoreDuringBuilds: false, // Fail build on ESLint errors
   },
   
   compiler: {

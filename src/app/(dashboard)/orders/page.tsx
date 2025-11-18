@@ -21,18 +21,22 @@ import { useOrders } from '@/presentation/hooks/use-orders'
 import { formatCurrency, formatDate } from '@/shared/utils/format'
 import { ROUTES } from '@/infrastructure/config/constants'
 import { toast } from 'sonner'
+import { Pagination } from '@/presentation/components/shared/pagination'
 
 export default function OrdersPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [exporting, setExporting] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
   
   const params = {
     search: searchQuery,
+    page: currentPage,
+    limit: 20,
     ...(statusFilter !== 'all' && { status: statusFilter }),
   }
   
-  const { orders, loading } = useOrders(params)
+  const { orders, pagination, loading } = useOrders(params)
 
   const getStatusVariant = (status: string) => {
     if (status === 'delivered') return 'success'
@@ -267,6 +271,17 @@ export default function OrdersPage() {
           )}
         </div>
       </Card>
+
+      {/* Pagination */}
+      {pagination && pagination.totalPages > 1 && (
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          totalItems={pagination.total}
+          itemsPerPage={pagination.limit}
+          onPageChange={setCurrentPage}
+        />
+      )}
     </div>
   )
 }

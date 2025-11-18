@@ -10,6 +10,7 @@ import { Sparkles, ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 import { httpClient } from '@/infrastructure/api/client'
 import { API_ENDPOINTS } from '@/infrastructure/config/api.config'
+import type { ForgotPasswordResponse, ApiError } from '@/shared/types/api-responses'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -21,7 +22,7 @@ export default function ForgotPasswordPage() {
     setLoading(true)
 
     try {
-      const response: any = await httpClient.post(API_ENDPOINTS.auth.forgotPassword, {
+      const response = await httpClient.post<ForgotPasswordResponse>(API_ENDPOINTS.auth.forgotPassword, {
         email,
       })
 
@@ -32,7 +33,8 @@ export default function ForgotPasswordPage() {
           duration: 5000
         })
       }
-    } catch (error: any) {
+    } catch (err) {
+      const error = err as ApiError
       if (error.errorCode === 'USER_NOT_FOUND' || error.error?.includes('not found')) {
         toast.error('Email not found', {
           description: 'No account exists with this email address.',

@@ -10,6 +10,27 @@ export interface UploadedImage {
   _id?: string
 }
 
+interface MediaItem {
+  _id: string
+  cloudinaryUrl: string
+  cloudinaryPublicId: string
+  filename: string
+  originalName?: string
+  fileSize?: number
+  mimeType?: string
+}
+
+interface MediaUploadResponse {
+  success: boolean
+  count: number
+  data: MediaItem[]
+}
+
+interface ProgressEvent {
+  loaded: number
+  total?: number
+}
+
 export function useImageUpload() {
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -22,30 +43,37 @@ export function useImageUpload() {
       setUploading(true)
       setUploadProgress(0)
 
-      const response: any = await httpClient.post(API_ENDPOINTS.media.upload, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        onUploadProgress: (progressEvent: any) => {
-          if (progressEvent.total) {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-            setUploadProgress(percentCompleted)
-          }
-        },
-      })
+      const response = await httpClient.post<MediaUploadResponse>(
+        API_ENDPOINTS.media.upload, 
+        formData, 
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          onUploadProgress: (progressEvent: ProgressEvent) => {
+            if (progressEvent.total) {
+              const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+              setUploadProgress(percentCompleted)
+            }
+          },
+        }
+      )
 
-      if (response.success && response.data) {
+      // Backend returns array in data field
+      if (response.success && response.data && response.data.length > 0) {
+        const media = response.data[0]
         return {
-          url: response.data.cloudinaryUrl,
+          url: media.cloudinaryUrl,
           altText: file.name.replace(/\.[^/.]+$/, ''),
           isDefault: false,
-          _id: response.data._id,
+          _id: media._id,
         }
       }
 
       return null
-    } catch (error: any) {
-      toast.error(error.error || 'Failed to upload image')
+    } catch (error) {
+      const apiError = error as { error?: string }
+      toast.error(apiError.error || 'Failed to upload image')
       return null
     } finally {
       setUploading(false)

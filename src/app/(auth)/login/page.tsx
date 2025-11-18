@@ -13,6 +13,7 @@ import { httpClient } from '@/infrastructure/api/client'
 import { API_ENDPOINTS } from '@/infrastructure/config/api.config'
 import { AUTH_TOKEN_KEY } from '@/infrastructure/config/constants'
 import { toast } from 'sonner'
+import type { LoginResponse, ApiError } from '@/shared/types/api-responses'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -32,7 +33,7 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const response: any = await httpClient.post(API_ENDPOINTS.auth.login, {
+      const response = await httpClient.post<LoginResponse>(API_ENDPOINTS.auth.login, {
         email,
         password
       })
@@ -47,7 +48,8 @@ export default function LoginPage() {
           router.push('/')
         }, 500)
       }
-    } catch (error: any) {
+    } catch (err) {
+      const error = err as ApiError
       if (error.errorCode === 'EMAIL_NOT_VERIFIED') {
         toast.error('Email not verified', {
           description: 'Please check your inbox for the verification link to activate your account.',

@@ -13,19 +13,23 @@ import { ReviewRepositoryImpl } from '@/infrastructure/repositories/review.repos
 import { formatRelativeTime } from '@/shared/utils/format'
 import { toast } from 'sonner'
 import type { Review } from '@/core/entities/review.entity'
+import { Pagination } from '@/presentation/components/shared/pagination'
 
 export default function ReviewsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all')
   const [selectedReviews, setSelectedReviews] = useState<string[]>([])
   const [bulkActionLoading, setBulkActionLoading] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
   
   const params = {
     search: searchQuery,
+    page: currentPage,
+    limit: 20,
     ...(statusFilter !== 'all' && { status: statusFilter }),
   }
   
-  const { reviews, loading, refetch } = useReviews(params)
+  const { reviews, pagination, loading, refetch } = useReviews(params)
   const reviewRepository = new ReviewRepositoryImpl()
 
   const handleApprove = async (id: string) => {
@@ -356,6 +360,17 @@ export default function ReviewsPage() {
             ))}
           </div>
         </>
+      )}
+
+      {/* Pagination */}
+      {pagination && pagination.totalPages > 1 && (
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          totalItems={pagination.total}
+          itemsPerPage={pagination.limit}
+          onPageChange={setCurrentPage}
+        />
       )}
     </div>
   )
