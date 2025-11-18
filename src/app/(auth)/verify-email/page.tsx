@@ -19,7 +19,7 @@ function VerifyEmailContent() {
 
   const verifyEmail = useCallback(async (token: string) => {
     try {
-      const response: any = await httpClient.post(API_ENDPOINTS.auth.verifyEmail, {
+      const response: { success: boolean; message?: string } = await httpClient.post(API_ENDPOINTS.auth.verifyEmail, {
         token
       })
       
@@ -29,9 +29,21 @@ function VerifyEmailContent() {
         toast.success('Email verified! You can now login.')
         setTimeout(() => router.push('/login'), 2000)
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const apiError = error as { error?: string | { message?: string }; message?: string }
       setState('error')
-      setMessage(error.error || 'Verification failed. The link may be invalid or expired.')
+      
+      // Extract error message safely
+      let errorMessage = 'Verification failed. The link may be invalid or expired.'
+      if (typeof apiError.error === 'string') {
+        errorMessage = apiError.error
+      } else if (typeof apiError.error === 'object' && apiError.error?.message) {
+        errorMessage = apiError.error.message
+      } else if (apiError.message) {
+        errorMessage = apiError.message
+      }
+      
+      setMessage(errorMessage)
       toast.error('Verification failed. Please try again or request a new link.')
     }
   }, [router])
