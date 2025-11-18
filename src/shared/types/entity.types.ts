@@ -6,6 +6,131 @@ export interface BaseEntity {
   updatedAt: string
 }
 
+// Jewelry-specific interfaces
+export type JewelryMaterial = 
+  | 'gold' 
+  | 'silver' 
+  | 'platinum' 
+  | 'white-gold' 
+  | 'rose-gold' 
+  | 'titanium' 
+  | 'stainless-steel' 
+  | 'brass' 
+  | 'copper'
+
+export type JewelryPurity = 
+  | '24k' 
+  | '22k' 
+  | '18k' 
+  | '14k' 
+  | '10k' 
+  | '925-sterling' 
+  | '999-fine' 
+  | '958-britannia' 
+  | 'other'
+
+export type StoneType = 
+  | 'diamond' 
+  | 'ruby' 
+  | 'sapphire' 
+  | 'emerald' 
+  | 'pearl' 
+  | 'amethyst' 
+  | 'topaz' 
+  | 'garnet' 
+  | 'opal' 
+  | 'turquoise' 
+  | 'cubic-zirconia' 
+  | 'moissanite' 
+  | 'none'
+
+export type StoneClarity = 
+  | 'FL' 
+  | 'IF' 
+  | 'VVS1' 
+  | 'VVS2' 
+  | 'VS1' 
+  | 'VS2' 
+  | 'SI1' 
+  | 'SI2' 
+  | 'I1' 
+  | 'I2' 
+  | 'I3' 
+  | 'N/A'
+
+export type StoneColor = 
+  | 'D' 
+  | 'E' 
+  | 'F' 
+  | 'G' 
+  | 'H' 
+  | 'I' 
+  | 'J' 
+  | 'K' 
+  | 'L' 
+  | 'M' 
+  | 'N' 
+  | 'fancy' 
+  | 'N/A'
+
+export type StoneCut = 
+  | 'excellent' 
+  | 'very-good' 
+  | 'good' 
+  | 'fair' 
+  | 'poor' 
+  | 'N/A'
+
+export type JewelryType = 
+  | 'ring' 
+  | 'necklace' 
+  | 'bracelet' 
+  | 'earrings' 
+  | 'pendant' 
+  | 'chain' 
+  | 'bangle' 
+  | 'anklet' 
+  | 'brooch' 
+  | 'cufflinks' 
+  | 'nose-ring' 
+  | 'toe-ring'
+
+export type JewelryGender = 'men' | 'women' | 'unisex' | 'kids'
+
+export type MetalWeightUnit = 'grams' | 'ounces' | 'carats'
+
+export type SizeType = 'ring-size' | 'length' | 'diameter' | 'adjustable' | 'one-size'
+
+export type SizeUnit = 'US' | 'UK' | 'EU' | 'mm' | 'cm' | 'inches'
+
+export interface JewelryDetails {
+  material?: JewelryMaterial
+  purity?: JewelryPurity
+  metalWeight?: {
+    value: number
+    unit: MetalWeightUnit
+  }
+  stone?: {
+    type: StoneType
+    caratWeight?: number
+    clarity?: StoneClarity
+    color?: StoneColor
+    cut?: StoneCut
+  }
+  size?: {
+    type: SizeType
+    value: string
+    unit: SizeUnit
+  }
+  certification?: {
+    available: boolean
+    issuedBy?: string
+    certificateNumber?: string
+  }
+  gender?: JewelryGender
+  type?: JewelryType
+}
+
 export interface Product extends BaseEntity {
   name: string
   slug: string
@@ -30,6 +155,7 @@ export interface Product extends BaseEntity {
     width?: number
     height?: number
   }
+  jewelry?: JewelryDetails
 }
 
 export interface Category extends BaseEntity {

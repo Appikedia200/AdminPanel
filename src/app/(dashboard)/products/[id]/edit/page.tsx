@@ -13,9 +13,11 @@ import { httpClient } from '@/infrastructure/api/client'
 import { API_ENDPOINTS } from '@/infrastructure/config/api.config'
 import { useCategories } from '@/presentation/hooks/use-categories'
 import { useImageUpload, type UploadedImage } from '@/presentation/hooks/use-image-upload'
+import { JewelryFields } from '@/presentation/components/products/JewelryFields'
 import { toast } from 'sonner'
 import { ROUTES } from '@/infrastructure/config/constants'
 import { Skeleton } from '@/presentation/components/ui/skeleton'
+import type { JewelryDetails } from '@/shared/types/entity.types'
 
 export default function EditProductPage() {
   const router = useRouter()
@@ -27,6 +29,7 @@ export default function EditProductPage() {
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
   const [images, setImages] = useState<UploadedImage[]>([])
+  const [jewelry, setJewelry] = useState<Partial<JewelryDetails>>({})
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -43,6 +46,11 @@ export default function EditProductPage() {
     ingredients: '',
     status: 'draft' as 'draft' | 'active' | 'inactive',
   })
+
+  // Determine if selected category is jewelry
+  const selectedCategory = categories.find(cat => cat._id === formData.category)
+  const isJewelryCategory = selectedCategory?.name?.toLowerCase().includes('jewelry') || 
+                             selectedCategory?.name?.toLowerCase().includes('jewellery') || false
 
   // Fetch product data
   useEffect(() => {
@@ -73,13 +81,18 @@ export default function EditProductPage() {
           
           // Set images
           if (product.images && product.images.length > 0) {
-            const productImages = product.images.map((img: any) => ({
-              url: img.url || img,
+            const productImages = product.images.map((img: { url?: string; altText?: string; isDefault?: boolean; _id?: string }) => ({
+              url: img.url || '',
               altText: img.altText || product.name,
               isDefault: img.isDefault || false,
               _id: img._id,
             }))
             setImages(productImages)
+          }
+
+          // Set jewelry details if present
+          if (product.jewelry) {
+            setJewelry(product.jewelry)
           }
         }
       } catch (error: any) {
@@ -149,10 +162,22 @@ export default function EditProductPage() {
       return
     }
 
+    // Validate jewelry-specific required fields
+    if (isJewelryCategory) {
+      if (!jewelry.material) {
+        toast.error('Material is required for jewelry products')
+        return
+      }
+      if (!jewelry.type) {
+        toast.error('Jewelry type is required for jewelry products')
+        return
+      }
+    }
+
     setLoading(true)
 
     try {
-      const payload = {
+      const payload: Record<string, unknown> = {
         name: formData.name,
         slug: formData.slug,
         description: {
@@ -176,14 +201,20 @@ export default function EditProductPage() {
         status: formData.status,
       }
 
-      const response: any = await httpClient.put(API_ENDPOINTS.products.update(productId), payload)
+      // Include jewelry details if this is a jewelry product
+      if (isJewelryCategory && Object.keys(jewelry).length > 0) {
+        payload.jewelry = jewelry
+      }
+
+      const response: { success: boolean } = await httpClient.put(API_ENDPOINTS.products.update(productId), payload)
       
       if (response.success) {
         toast.success('Product updated successfully')
         router.push(ROUTES.PRODUCTS)
       }
-    } catch (error: any) {
-      toast.error(error.error || 'Failed to update product')
+    } catch (error) {
+      const apiError = error as { error?: string }
+      toast.error(apiError.error || 'Failed to update product')
     } finally {
       setLoading(false)
     }
@@ -507,6 +538,13 @@ export default function EditProductPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Jewelry Details (conditionally rendered) */}
+        <JewelryFields 
+          jewelry={jewelry}
+          setJewelry={setJewelry}
+          isJewelryCategory={isJewelryCategory}
+        />
 
         {/* Status */}
         <Card>

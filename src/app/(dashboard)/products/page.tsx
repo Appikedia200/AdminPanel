@@ -24,6 +24,7 @@ import {
 } from '@/presentation/components/ui/dropdown-menu'
 import { Skeleton } from '@/presentation/components/ui/skeleton'
 import { useProducts } from '@/presentation/hooks/use-products'
+import { JewelryFilters } from '@/presentation/components/products/JewelryFilters'
 import { formatCurrency } from '@/shared/utils/format'
 import { ROUTES } from '@/infrastructure/config/constants'
 import { httpClient } from '@/infrastructure/api/client'
@@ -36,11 +37,27 @@ export default function ProductsPage() {
   const [selectedProducts, setSelectedProducts] = useState<string[]>([])
   const [bulkUpdating, setBulkUpdating] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
+  const [jewelryFilters, setJewelryFilters] = useState<Record<string, string | undefined>>({})
+  
   const { products, pagination, loading, deleteProduct, refetch } = useProducts({ 
     search: searchQuery,
     page: currentPage,
-    limit: 20
+    limit: 20,
+    ...jewelryFilters
   })
+
+  const handleJewelryFilterChange = (key: string, value: string | undefined) => {
+    setJewelryFilters(prev => ({
+      ...prev,
+      [key]: value
+    }))
+    setCurrentPage(1) // Reset to first page when filters change
+  }
+
+  const handleClearJewelryFilters = () => {
+    setJewelryFilters({})
+    setCurrentPage(1)
+  }
 
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this product?')) {
@@ -129,6 +146,15 @@ export default function ProductsPage() {
             className="pl-10"
           />
         </div>
+      </Card>
+
+      {/* Jewelry Filters */}
+      <Card className="p-4">
+        <JewelryFilters
+          filters={jewelryFilters}
+          onFilterChange={handleJewelryFilterChange}
+          onClearFilters={handleClearJewelryFilters}
+        />
       </Card>
 
       {/* Desktop Table View */}

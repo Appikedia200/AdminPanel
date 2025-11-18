@@ -13,8 +13,10 @@ import { httpClient } from '@/infrastructure/api/client'
 import { API_ENDPOINTS } from '@/infrastructure/config/api.config'
 import { useCategories } from '@/presentation/hooks/use-categories'
 import { useImageUpload, type UploadedImage } from '@/presentation/hooks/use-image-upload'
+import { JewelryFields } from '@/presentation/components/products/JewelryFields'
 import { toast } from 'sonner'
 import { ROUTES } from '@/infrastructure/config/constants'
+import type { JewelryDetails } from '@/shared/types/entity.types'
 
 export default function NewProductPage() {
   const router = useRouter()
@@ -23,6 +25,7 @@ export default function NewProductPage() {
   
   const [loading, setLoading] = useState(false)
   const [images, setImages] = useState<UploadedImage[]>([])
+  const [jewelry, setJewelry] = useState<Partial<JewelryDetails>>({})
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -39,6 +42,11 @@ export default function NewProductPage() {
     ingredients: '',
     status: 'draft' as 'draft' | 'active' | 'inactive',
   })
+
+  // Determine if selected category is jewelry
+  const selectedCategory = categories.find(cat => cat._id === formData.category)
+  const isJewelryCategory = selectedCategory?.name?.toLowerCase().includes('jewelry') || 
+                             selectedCategory?.name?.toLowerCase().includes('jewellery') || false
 
   // Auto-generate slug from name
   useEffect(() => {
@@ -108,10 +116,22 @@ export default function NewProductPage() {
       return
     }
 
+    // Validate jewelry-specific required fields
+    if (isJewelryCategory) {
+      if (!jewelry.material) {
+        toast.error('Material is required for jewelry products')
+        return
+      }
+      if (!jewelry.type) {
+        toast.error('Jewelry type is required for jewelry products')
+        return
+      }
+    }
+
     setLoading(true)
 
     try {
-      const payload = {
+      const payload: Record<string, unknown> = {
         name: formData.name,
         slug: formData.slug,
         description: {
@@ -135,14 +155,20 @@ export default function NewProductPage() {
         status: formData.status,
       }
 
-      const response: any = await httpClient.post(API_ENDPOINTS.products.create, payload)
+      // Include jewelry details if this is a jewelry product
+      if (isJewelryCategory && Object.keys(jewelry).length > 0) {
+        payload.jewelry = jewelry
+      }
+
+      const response: { success: boolean } = await httpClient.post(API_ENDPOINTS.products.create, payload)
       
       if (response.success) {
         toast.success('Product created successfully')
         router.push(ROUTES.PRODUCTS)
       }
-    } catch (error: any) {
-      toast.error(error.error || 'Failed to create product')
+    } catch (error) {
+      const apiError = error as { error?: string }
+      toast.error(apiError.error || 'Failed to create product')
     } finally {
       setLoading(false)
     }
@@ -447,6 +473,13 @@ export default function NewProductPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Jewelry Details (conditionally rendered) */}
+        <JewelryFields 
+          jewelry={jewelry}
+          setJewelry={setJewelry}
+          isJewelryCategory={isJewelryCategory}
+        />
 
         {/* Status */}
         <Card>
