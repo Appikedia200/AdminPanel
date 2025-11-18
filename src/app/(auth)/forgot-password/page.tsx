@@ -35,7 +35,9 @@ export default function ForgotPasswordPage() {
       }
     } catch (err) {
       const error = err as ApiError
-      if (error.errorCode === 'USER_NOT_FOUND' || error.error?.includes('not found')) {
+      const errorMessage = typeof error.error === 'string' ? error.error : ''
+      
+      if (error.errorCode === 'USER_NOT_FOUND' || errorMessage.includes('not found')) {
         toast.error('Email not found', {
           description: 'No account exists with this email address.',
           duration: 5000
@@ -52,7 +54,7 @@ export default function ForgotPasswordPage() {
         })
       } else {
         toast.error('Failed to send reset link', {
-          description: error.error || 'Something went wrong. Please try again.',
+          description: errorMessage || 'Something went wrong. Please try again.',
           duration: 5000
         })
       }

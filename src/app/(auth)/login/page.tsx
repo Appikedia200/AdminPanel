@@ -50,6 +50,8 @@ export default function LoginPage() {
       }
     } catch (err) {
       const error = err as ApiError
+      const errorMessage = typeof error.error === 'string' ? error.error : ''
+      
       if (error.errorCode === 'EMAIL_NOT_VERIFIED') {
         toast.error('Email not verified', {
           description: 'Please check your inbox for the verification link to activate your account.',
@@ -60,7 +62,7 @@ export default function LoginPage() {
           description: 'Too many failed login attempts. Please try again later or reset your password.',
           duration: 6000
         })
-      } else if (error.errorCode === 'INVALID_CREDENTIALS' || error.error?.includes('Invalid')) {
+      } else if (error.errorCode === 'INVALID_CREDENTIALS' || errorMessage.includes('Invalid')) {
         toast.error('Invalid credentials', {
           description: 'The email or password you entered is incorrect.',
           duration: 5000
@@ -72,7 +74,7 @@ export default function LoginPage() {
         })
       } else {
         toast.error('Login failed', {
-          description: error.error || 'Unable to sign in. Please try again.',
+          description: errorMessage || 'Unable to sign in. Please try again.',
           duration: 5000
         })
       }

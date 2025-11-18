@@ -47,21 +47,15 @@ export default function RegisterPage() {
       })
 
       if (response.success) {
-        // Show clear success message
-        toast.success('✅ Account created successfully!', {
-          description: 'Check your email for the verification link to activate your account.',
-          duration: 6000
-        })
-        
-        // Small delay before redirect to ensure user sees the message
-        setTimeout(() => {
-          router.push('/login')
-        }, 1500)
+        // Redirect to verification sent page with email
+        router.push(`/verification-sent?email=${encodeURIComponent(formData.email)}`)
       }
     } catch (err) {
       const error = err as ApiError
+      const errorMessage = typeof error.error === 'string' ? error.error : ''
+      
       // Handle specific error cases
-      if (error.errorCode === 'EMAIL_ALREADY_EXISTS' || error.error?.includes('already exists')) {
+      if (error.errorCode === 'EMAIL_ALREADY_EXISTS' || errorMessage.includes('already exists')) {
         toast.error('Email already registered', {
           description: 'This email is already in use. Try logging in or use a different email.',
           duration: 5000
@@ -88,7 +82,7 @@ export default function RegisterPage() {
         })
       } else {
         toast.error('Registration failed', {
-          description: error.error || 'Something went wrong. Please try again.',
+          description: errorMessage || 'Something went wrong. Please try again.',
           duration: 5000
         })
       }
