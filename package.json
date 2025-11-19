@@ -9,7 +9,6 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
-    "cf:deploy": "wrangler pages deploy .next",
     "audit:fix": "npm audit fix"
   },
   "dependencies": {
