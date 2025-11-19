@@ -1,27 +1,10 @@
 # Cloudflare Pages Configuration for GlowNatura Admin Panel
-# 
-# This file is for reference only when using Cloudflare Pages with GitHub integration.
-# Cloudflare Pages will automatically detect Next.js and use the correct build settings.
-#
-# DEPLOYMENT INSTRUCTIONS:
-# 1. Go to Cloudflare Pages dashboard
-# 2. Connect your GitHub repository (Appikedia200/AdminPanel)
-# 3. Set build settings:
-#    - Framework preset: Next.js
-#    - Build command: npm run build
-#    - Build output directory: (leave empty - auto-detected)
-#
-# 4. Add environment variables in Cloudflare dashboard:
-#    - NEXT_PUBLIC_API_URL = https://backendglownaturas.onrender.com
-#    - NEXT_PUBLIC_ADMIN_URL = https://glownatura-admin.pages.dev
-#    - NODE_ENV = production
-#    - NODE_VERSION = 22.16.0
-#
-# DO NOT use "npm run deploy" - it's not needed for GitHub integration!
+# For Pages projects, this file is minimal - most config is in dashboard
 
 name = "glownatura-admin"
-compatibility_date = "2024-01-01"
+pages_build_output_dir = ".next"
 
-# Node.js compatibility for Next.js SSR
+# Node.js compatibility for Next.js SSR  
 compatibility_flags = ["nodejs_compat"]
+compatibility_date = "2024-01-01"
 
