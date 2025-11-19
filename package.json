@@ -10,7 +10,7 @@
     "type-check": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
     "audit:fix": "npm audit fix",
-    "pages:deploy": "npx wrangler pages deploy .next",
+    "pages:deploy": "npx wrangler pages deploy .next --project-name=glownatura-admin",
     "pages:dev": "npx wrangler pages dev .next"
   },
   "dependencies": {
