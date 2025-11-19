@@ -28,8 +28,12 @@ export default {
         assetKey = 'server/app/' + assetKey + '.html'
       }
       
+      console.log('DEBUG - Looking for:', assetKey)
+      console.log('DEBUG - Manifest keys:', Object.keys(manifest).filter(k => k.includes('server/app')).slice(0, 10))
+      
       // Look up the asset in the manifest (manifest maps unhashed -> hashed names)
       const assetPath = manifest[assetKey] || assetKey
+      console.log('DEBUG - Found path:', assetPath)
       
       // Fetch from KV
       const content = await env.__STATIC_CONTENT.get(assetPath, { type: 'arrayBuffer' })
