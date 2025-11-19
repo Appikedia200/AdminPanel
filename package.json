@@ -9,7 +9,10 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
-    "audit:fix": "npm audit fix"
+    "audit:fix": "npm audit fix",
+    "clean:cache": "node -e \"require('fs').rmSync('.next/cache', {recursive: true, force: true})\" || echo 'No cache to clean'",
+    "pages:deploy": "npm run clean:cache && npx wrangler pages deploy .next --project-name=glownatura-admin",
+    "pages:dev": "npx wrangler pages dev .next"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
