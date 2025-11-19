@@ -9,28 +9,26 @@ export default {
       // Determine the file path
       let assetKey = url.pathname
       
+      // Remove leading slash first
+      if (assetKey.startsWith('/')) {
+        assetKey = assetKey.slice(1)
+      }
+      
       // Handle HTML pages
-      if (!assetKey.includes('.') && !assetKey.startsWith('/_next/')) {
+      if (!assetKey && assetKey !== '0') {
+        // Root path
+        assetKey = 'server/app/index.html'
+      } else if (!assetKey.includes('.') && !assetKey.startsWith('_next/')) {
         // Remove trailing slash
-        if (assetKey.endsWith('/') && assetKey !== '/') {
+        if (assetKey.endsWith('/')) {
           assetKey = assetKey.slice(0, -1)
         }
         
         // Map to server/app HTML files
-        if (assetKey === '/') {
-          assetKey = 'server/app/index.html'
-        } else {
-          assetKey = 'server/app' + assetKey + '.html'
-        }
-      } else if (assetKey.startsWith('/_next/')) {
-        // Static assets - remove leading slash
-        assetKey = assetKey.slice(1)
-      } else if (assetKey.startsWith('/')) {
-        // Other static files
-        assetKey = assetKey.slice(1)
+        assetKey = 'server/app/' + assetKey + '.html'
       }
       
-      // Look up the asset in the manifest
+      // Look up the asset in the manifest (manifest maps unhashed -> hashed names)
       const assetPath = manifest[assetKey] || assetKey
       
       // Fetch from KV
