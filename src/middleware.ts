@@ -9,7 +9,8 @@ export function middleware(request: NextRequest) {
   const isAuthPage = pathname.startsWith('/login') || 
                     pathname.startsWith('/register') || 
                     pathname.startsWith('/forgot-password') ||
-                    pathname.startsWith('/verify-email')
+                    pathname.startsWith('/verify-email') ||
+                    pathname.startsWith('/verification-sent')
 
   // Define public paths (no auth required)
   const isPublicPath = isAuthPage

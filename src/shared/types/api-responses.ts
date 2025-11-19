@@ -29,6 +29,10 @@ export interface RegisterResponse {
 export interface VerifyEmailResponse {
   success: boolean
   message: string
+  token?: string
+  data?: {
+    admin: Omit<Admin, 'password'>
+  }
 }
 
 export interface ForgotPasswordResponse {

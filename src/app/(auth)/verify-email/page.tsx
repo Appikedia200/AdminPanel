@@ -2,12 +2,15 @@
 
 import { Suspense, useEffect, useState, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Cookies from 'js-cookie'
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/presentation/components/ui/card'
 import { Button } from '@/presentation/components/ui/button'
 import { httpClient } from '@/infrastructure/api/client'
 import { API_ENDPOINTS } from '@/infrastructure/config/api.config'
+import { AUTH_TOKEN_KEY } from '@/infrastructure/config/constants'
 import { toast } from 'sonner'
+import type { VerifyEmailResponse } from '@/shared/types/api-responses'
 
 type VerificationState = 'loading' | 'success' | 'error'
 
@@ -19,15 +22,26 @@ function VerifyEmailContent() {
 
   const verifyEmail = useCallback(async (token: string) => {
     try {
-      const response: { success: boolean; message?: string } = await httpClient.post(API_ENDPOINTS.auth.verifyEmail, {
+      const response = await httpClient.post<VerifyEmailResponse>(API_ENDPOINTS.auth.verifyEmail, {
         token
       })
       
       if (response.success) {
         setState('success')
-        setMessage('Email verified successfully! Redirecting to login...')
-        toast.success('Email verified! You can now login.')
-        setTimeout(() => router.push('/login'), 2000)
+        
+        // Check if backend returned a token for auto-login
+        if (response.token) {
+          // Auto-login: Store token and redirect to dashboard
+          Cookies.set(AUTH_TOKEN_KEY, response.token, { expires: 7 })
+          setMessage('Email verified successfully! Logging you in...')
+          toast.success('Welcome! Redirecting to dashboard...', { duration: 2000 })
+          setTimeout(() => router.push('/'), 2000)
+        } else {
+          // Fallback: Redirect to login page
+          setMessage('Email verified successfully! Please login to continue.')
+          toast.success('Email verified! You can now login.', { duration: 3000 })
+          setTimeout(() => router.push('/login'), 2000)
+        }
       }
     } catch (error: unknown) {
       const apiError = error as { error?: string | { message?: string }; message?: string }
