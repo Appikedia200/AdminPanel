@@ -2,9 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-
-// Mark as dynamic for admin panel
-export const dynamic = 'force-dynamic'
 import { ArrowLeft, Eye, Send, RotateCcw, Save } from 'lucide-react'
 import { Button } from '@/presentation/components/ui/button'
 import { Input } from '@/presentation/components/ui/input'

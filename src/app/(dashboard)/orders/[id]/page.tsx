@@ -2,9 +2,6 @@
 
 import { use, useState } from 'react'
 import Link from 'next/link'
-
-// Mark as dynamic for admin panel
-export const dynamic = 'force-dynamic'
 import { ArrowLeft, CheckCircle2, Truck, MessageSquare, X } from 'lucide-react'
 import { Button } from '@/presentation/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/card'
