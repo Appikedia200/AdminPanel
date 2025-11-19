@@ -22,9 +22,9 @@ function VerifyEmailContent() {
 
   const verifyEmail = useCallback(async (token: string) => {
     try {
-      const response = await httpClient.post<VerifyEmailResponse>(API_ENDPOINTS.auth.verifyEmail, {
-        token
-      })
+      const response = await httpClient.get<VerifyEmailResponse>(
+        `${API_ENDPOINTS.auth.verifyEmail}?token=${encodeURIComponent(token)}`
+      )
       
       if (response.success) {
         setState('success')
