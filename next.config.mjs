@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-  trailingSlash: true,
-  distDir: 'out',
   images: {
     unoptimized: true,
   },
@@ -10,8 +7,7 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
   eslint: {
-    // Allow build to continue even with dynamic route warnings
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   poweredByHeader: false,
   reactStrictMode: true,
