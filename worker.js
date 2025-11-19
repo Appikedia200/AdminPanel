@@ -10,19 +10,26 @@ export default {
         return new Response('', { status: 404 })
       }
       
-      // Handle Next.js routing - files are in server/app/ directory
+      // Handle Next.js routing
       let targetPath = url.pathname
       
-      // Remove trailing slash
-      if (targetPath.endsWith('/') && targetPath !== '/') {
-        targetPath = targetPath.slice(0, -1)
-      }
-      
-      if (targetPath === '/') {
-        targetPath = '/server/app/index.html'
-      } else if (!targetPath.includes('.')) {
-        // Try server/app path structure
-        targetPath = '/server/app' + targetPath + '.html'
+      // Serve static assets directly (JS, CSS, images)
+      if (targetPath.startsWith('/_next/') || targetPath.includes('.')) {
+        // Static files - serve as-is
+        targetPath = url.pathname
+      } else {
+        // HTML pages - files are in server/app/ directory
+        // Remove trailing slash
+        if (targetPath.endsWith('/') && targetPath !== '/') {
+          targetPath = targetPath.slice(0, -1)
+        }
+        
+        if (targetPath === '/') {
+          targetPath = '/server/app/index.html'
+        } else {
+          // Try server/app path structure
+          targetPath = '/server/app' + targetPath + '.html'
+        }
       }
       
       const modifiedUrl = new URL(request.url)
