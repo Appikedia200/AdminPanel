@@ -10,14 +10,19 @@ export default {
         return new Response('', { status: 404 })
       }
       
-      // Handle Next.js routing
+      // Handle Next.js routing - files are in server/app/ directory
       let targetPath = url.pathname
+      
+      // Remove trailing slash
+      if (targetPath.endsWith('/') && targetPath !== '/') {
+        targetPath = targetPath.slice(0, -1)
+      }
+      
       if (targetPath === '/') {
-        targetPath = '/index.html'
-      } else if (!targetPath.includes('.') && !targetPath.endsWith('/')) {
-        targetPath = targetPath + '/index.html'
-      } else if (targetPath.endsWith('/')) {
-        targetPath = targetPath + 'index.html'
+        targetPath = '/server/app/index.html'
+      } else if (!targetPath.includes('.')) {
+        // Try server/app path structure
+        targetPath = '/server/app' + targetPath + '.html'
       }
       
       const modifiedUrl = new URL(request.url)
@@ -46,7 +51,7 @@ export default {
       if (e.status === 404 || (e.message && e.message.includes('could not find'))) {
         try {
           const indexUrl = new URL(request.url)
-          indexUrl.pathname = '/index.html'
+          indexUrl.pathname = '/server/app/index.html'
           const indexRequest = new Request(indexUrl.toString(), {
             method: request.method,
             headers: request.headers,
