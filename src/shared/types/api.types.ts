@@ -3,13 +3,6 @@ export interface LoginRequest {
   password: string
 }
 
-import type { Admin } from './entity.types'
-
-export interface LoginResponse {
-  token: string
-  admin: Admin
-}
-
 export interface ProductImage {
   url: string
   publicId: string

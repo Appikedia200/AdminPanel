@@ -1,6 +1,7 @@
 import type { IAuthService } from '@/core/ports/services/auth.service'
 import type { Admin } from '@/core/entities/admin.entity'
-import type { LoginRequest, LoginResponse } from '@/shared/types/api.types'
+import type { LoginRequest } from '@/shared/types/api.types'
+import type { LoginResponse } from '@/shared/types/api-responses'
 import type { ApiResponse } from '@/shared/types'
 import { httpClient } from '@/infrastructure/api/client'
 import { API_ENDPOINTS } from '@/infrastructure/config/api.config'
@@ -8,14 +9,14 @@ import { AUTH_TOKEN_KEY } from '@/infrastructure/config/constants'
 import Cookies from 'js-cookie'
 
 export class AuthServiceImpl implements IAuthService {
-  async login(credentials: LoginRequest): Promise<ApiResponse<LoginResponse>> {
-    const response = await httpClient.post<ApiResponse<LoginResponse>>(
+  async login(credentials: LoginRequest): Promise<LoginResponse> {
+    const response = await httpClient.post<LoginResponse>(
       API_ENDPOINTS.auth.login,
       credentials
     )
 
-    if (response.success && response.data.token) {
-      Cookies.set(AUTH_TOKEN_KEY, response.data.token, { expires: 7 })
+    if (response.success && response.token) {
+      Cookies.set(AUTH_TOKEN_KEY, response.token, { expires: 7 })
     }
 
     return response

@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { AUTH_TOKEN_KEY } from '@/infrastructure/config/constants'
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get('auth_token')?.value
+  const token = request.cookies.get(AUTH_TOKEN_KEY)?.value
   const { pathname } = request.nextUrl
 
   // Define auth pages

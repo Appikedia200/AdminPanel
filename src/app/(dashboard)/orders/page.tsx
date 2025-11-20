@@ -18,6 +18,7 @@ import {
 } from '@/presentation/components/ui/table'
 import { Skeleton } from '@/presentation/components/ui/skeleton'
 import { useOrders } from '@/presentation/hooks/use-orders'
+import { API_ENDPOINTS } from '@/infrastructure/config/api.config'
 import { formatCurrency, formatDate } from '@/shared/utils/format'
 import { ROUTES } from '@/infrastructure/config/constants'
 import { toast } from 'sonner'
@@ -64,10 +65,11 @@ export default function OrdersPage() {
       })
       
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'https://backendglownaturas.onrender.com'}/api/orders/export?${queryParams}`,
+        `${API_ENDPOINTS.orders.export}?${queryParams}`,
         {
           headers: {
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
           }
         }
       )
