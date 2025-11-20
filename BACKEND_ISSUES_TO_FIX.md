@@ -50,10 +50,15 @@ app.use('/api/admin', rateLimitAdmin)   // 200/min
 
 ---
 
-## ❌ ISSUE 2: Email Templates Returning Invalid Data
+## ❌ ISSUE 2: Email Templates Returning Invalid Data (CRITICAL)
+
+**Status:** Frontend shows "No Email Templates Found" message
 
 **Problem:**
-`GET /api/email-templates` returns templates with `undefined` or missing `type` field.
+`GET /api/email-templates` either:
+1. Returns empty array `[]`
+2. Returns templates with `undefined` or missing `type` field
+3. Returns 404 or error
 
 **Evidence:**
 ```

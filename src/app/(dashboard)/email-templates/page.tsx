@@ -89,17 +89,29 @@ export default function EmailTemplatesPage() {
         <p className="text-muted-foreground mt-2">Customize email notifications sent to customers</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        {templates.map((template) => {
-          const info = templateInfo[template.type] || { title: template.type, description: '' }
-          
-          // Skip if template type is undefined or invalid
-          if (!template.type || template.type === 'undefined') {
-            console.warn('Invalid template:', template)
-            return null
-          }
-          
-          return (
+      {templates.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16">
+            <Mail className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No Email Templates Found</h3>
+            <p className="text-sm text-muted-foreground text-center max-w-md">
+              Backend is not returning email templates. Please check the backend documentation 
+              in <code className="bg-muted px-2 py-1 rounded">BACKEND_ISSUES_TO_FIX.md</code>
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2">
+          {templates.map((template) => {
+            const info = templateInfo[template.type] || { title: template.type, description: '' }
+            
+            // Skip if template type is undefined or invalid
+            if (!template.type || template.type === 'undefined') {
+              console.warn('Invalid template:', template)
+              return null
+            }
+            
+            return (
             <Card 
               key={template.type} 
               className="cursor-pointer hover:border-primary transition-colors"
@@ -132,9 +144,10 @@ export default function EmailTemplatesPage() {
                 )}
               </CardContent>
             </Card>
-          )
-        })}
-      </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

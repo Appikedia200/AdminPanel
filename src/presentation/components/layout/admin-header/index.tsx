@@ -62,13 +62,39 @@ export function AdminHeader({ onMenuClick, user }: AdminHeaderProps) {
 
       <div className="flex-1" />
 
-      <Button variant="ghost" size="icon" className="relative">
-        <Bell className="h-5 w-5" />
-        <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-destructive-foreground">
-          1
-        </span>
-        <span className="sr-only">Notifications</span>
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="relative">
+            <Bell className="h-5 w-5" />
+            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-destructive-foreground">
+              1
+            </span>
+            <span className="sr-only">Notifications</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-80" align="end" forceMount>
+          <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <div className="max-h-96 overflow-y-auto">
+            <DropdownMenuItem className="flex flex-col items-start py-3 cursor-pointer">
+              <div className="flex items-start gap-3 w-full">
+                <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium">New pending review</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    A customer left a review for your product
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">2 hours ago</p>
+                </div>
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="flex items-center justify-center text-sm text-muted-foreground py-2">
+              No more notifications
+            </DropdownMenuItem>
+          </div>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
