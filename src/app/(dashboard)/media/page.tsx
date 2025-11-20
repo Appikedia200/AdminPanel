@@ -72,20 +72,52 @@ export default function MediaPage() {
     if (!files || files.length === 0) return
 
     const fileArray = Array.from(files)
+    
+    // Validate file types
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+    const invalidFiles = fileArray.filter(file => !validTypes.includes(file.type))
+    
+    if (invalidFiles.length > 0) {
+      toast.error('Only image files (JPEG, PNG, GIF, WebP) are allowed')
+      e.target.value = ''
+      return
+    }
+    
+    // Validate file sizes (max 5MB per file)
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    const oversizedFiles = fileArray.filter(file => file.size > maxSize)
+    
+    if (oversizedFiles.length > 0) {
+      toast.error('Each image must be less than 5MB')
+      e.target.value = ''
+      return
+    }
+    
     if (fileArray.length > 10) {
       toast.error('Maximum 10 files allowed per upload')
+      e.target.value = ''
       return
     }
 
     try {
+      const loadingToast = toast.loading(`Uploading ${fileArray.length} image(s)...`)
+      
       const uploaded = await uploadMultipleImages(fileArray)
+      
+      toast.dismiss(loadingToast)
+      
       if (uploaded.length > 0) {
         toast.success(`${uploaded.length} image(s) uploaded successfully`)
-        fetchMedia() // Refresh list
+        await fetchMedia() // Refresh list
+      } else {
+        toast.error('Failed to upload images. Please try again.')
       }
+      
       e.target.value = '' // Reset input
-    } catch {
-      toast.error('Failed to upload images')
+    } catch (error) {
+      console.error('Upload error:', error)
+      toast.error('Failed to upload images. Please check your connection and try again.')
+      e.target.value = ''
     }
   }
 

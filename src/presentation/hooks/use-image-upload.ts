@@ -59,9 +59,17 @@ export function useImageUpload() {
         }
       )
 
+      console.log('Upload response:', response)
+
       // Backend returns array in data field
       if (response.success && response.data && response.data.length > 0) {
         const media = response.data[0]
+        
+        if (!media.cloudinaryUrl) {
+          console.error('Invalid upload response - missing cloudinaryUrl:', media)
+          throw new Error('Invalid server response - missing image URL')
+        }
+        
         return {
           url: media.cloudinaryUrl,
           altText: file.name.replace(/\.[^/.]+$/, ''),
@@ -70,10 +78,12 @@ export function useImageUpload() {
         }
       }
 
-      return null
+      throw new Error('Invalid server response - no data returned')
     } catch (error) {
-      const apiError = error as { error?: string }
-      toast.error(apiError.error || 'Failed to upload image')
+      console.error('Upload error:', error)
+      const apiError = error as { error?: string; message?: string }
+      const errorMessage = apiError.error || apiError.message || 'Failed to upload image'
+      toast.error(errorMessage)
       return null
     } finally {
       setUploading(false)
