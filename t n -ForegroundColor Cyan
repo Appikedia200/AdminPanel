@@ -1,0 +1,15 @@
+[33m7e524f5[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m fix: Import LoginResponse from correct file (api-responses.ts)
+ src/core/ports/services/auth.service.ts | 3 [32m++[m[31m-[m
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+[33m95cdffa[m fix: Correct LoginResponse type to match backend structure
+ src/shared/types/api-responses.ts | 2 [32m+[m[31m-[m
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+[33m8b35be9[m fix: Token extraction in login page
+ src/app/(auth)/login/page.tsx | 9 [32m+++++[m[31m----[m
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+[33m0ab5239[m fix: Extract token from response.data.token (backend format)
+ src/infrastructure/repositories/auth.service.impl.ts | 5 [32m+++[m[31m--[m
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+[33m9af3521[m feat: add backend warming notification for Render cold starts
+ src/app/(auth)/login/page.tsx | 10 [32m++++++++++[m
+ 1 file changed, 10 insertions(+)

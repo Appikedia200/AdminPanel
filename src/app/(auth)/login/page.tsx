@@ -31,22 +31,12 @@ export default function LoginPage() {
     }
 
     setLoading(true)
-    
-    // Show backend warming message after 3 seconds
-    const warmingTimeout = setTimeout(() => {
-      toast.info('Waking up backend...', {
-        description: 'This may take up to 50 seconds on first request.',
-        duration: 8000
-      })
-    }, 3000)
 
     try {
       const response = await httpClient.post<LoginResponse>(API_ENDPOINTS.auth.login, {
         email,
         password
       })
-      
-      clearTimeout(warmingTimeout)
       
       console.log('🔍 Login Response:', response)
       console.log('✅ Token from data:', response.data?.token)
