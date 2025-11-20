@@ -12,9 +12,9 @@ export interface ApiResponse<T = unknown> {
 // Authentication responses
 export interface LoginResponse {
   success: boolean
-  token: string
   data: {
     admin: Admin
+    token: string
   }
 }
 
