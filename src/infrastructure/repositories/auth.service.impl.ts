@@ -15,8 +15,9 @@ export class AuthServiceImpl implements IAuthService {
       credentials
     )
 
-    if (response.success && response.token) {
-      Cookies.set(AUTH_TOKEN_KEY, response.token, { expires: 7 })
+    // Backend returns token inside data object
+    if (response.success && response.data?.token) {
+      Cookies.set(AUTH_TOKEN_KEY, response.data.token, { expires: 7 })
     }
 
     return response
