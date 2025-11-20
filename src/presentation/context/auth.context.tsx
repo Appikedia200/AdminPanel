@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       if (authService.isAuthenticated()) {
         const response = await authService.getCurrentUser()
-        if (response.success) {
+        if (response.success && response.data) {
           setUser(response.data)
         }
       }

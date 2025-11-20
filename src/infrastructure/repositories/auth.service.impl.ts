@@ -15,9 +15,14 @@ export class AuthServiceImpl implements IAuthService {
       credentials
     )
 
-    // Backend returns token inside data object
+    console.log('🔍 Auth Service Response:', JSON.stringify(response, null, 2))
+    
+    // httpClient returns response.data, token is inside data object  
     if (response.success && response.data?.token) {
       Cookies.set(AUTH_TOKEN_KEY, response.data.token, { expires: 7 })
+      console.log('✅ Token stored successfully')
+    } else {
+      console.error('❌ Login failed:', { success: response.success, hasToken: !!response.data?.token })
     }
 
     return response

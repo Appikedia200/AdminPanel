@@ -1,10 +1,9 @@
 import type { Admin } from '@/core/entities/admin.entity'
 import type { LoginRequest } from '@/shared/types/api.types'
-import type { LoginResponse } from '@/shared/types/api-responses'
-import type { ApiResponse } from '@/shared/types'
+import type { LoginResponse, ApiResponse } from '@/shared/types/api-responses'
 
 export interface IAuthService {
-  login(credentials: LoginRequest): Promise<ApiResponse<LoginResponse>>
+  login(credentials: LoginRequest): Promise<LoginResponse>
   logout(): Promise<ApiResponse<void>>
   getCurrentUser(): Promise<ApiResponse<Admin>>
   isAuthenticated(): boolean
