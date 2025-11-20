@@ -49,11 +49,12 @@ export default function LoginPage() {
       clearTimeout(warmingTimeout)
       
       console.log('🔍 Login Response:', response)
-      console.log('✅ Token:', response.token)
+      console.log('✅ Token from data:', response.data?.token)
       console.log('✅ Success:', response.success)
       
-      if (response.success && response.token) {
-        Cookies.set(AUTH_TOKEN_KEY, response.token, { expires: 7 })
+      // Backend returns token inside data object
+      if (response.success && response.data?.token) {
+        Cookies.set(AUTH_TOKEN_KEY, response.data.token, { expires: 7 })
         toast.success('Welcome back!', {
           description: 'Redirecting to dashboard...',
           duration: 2000
@@ -62,7 +63,7 @@ export default function LoginPage() {
           router.push('/')
         }, 500)
       } else {
-        console.error('❌ Login condition failed:', { success: response.success, hasToken: !!response.token })
+        console.error('❌ Login condition failed:', { success: response.success, hasToken: !!response.data?.token })
         toast.error('Login response invalid', {
           description: 'Please contact support.',
           duration: 5000
