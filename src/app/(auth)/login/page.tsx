@@ -38,6 +38,10 @@ export default function LoginPage() {
         password
       })
       
+      console.log('🔍 Login Response:', response)
+      console.log('✅ Token:', response.token)
+      console.log('✅ Success:', response.success)
+      
       if (response.success && response.token) {
         Cookies.set(AUTH_TOKEN_KEY, response.token, { expires: 7 })
         toast.success('Welcome back!', {
@@ -47,6 +51,12 @@ export default function LoginPage() {
         setTimeout(() => {
           router.push('/')
         }, 500)
+      } else {
+        console.error('❌ Login condition failed:', { success: response.success, hasToken: !!response.token })
+        toast.error('Login response invalid', {
+          description: 'Please contact support.',
+          duration: 5000
+        })
       }
     } catch (err) {
       const error = err as ApiError
