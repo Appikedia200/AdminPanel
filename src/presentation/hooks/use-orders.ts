@@ -24,7 +24,18 @@ export function useOrders(params?: QueryParams) {
       setOrders(response.data)
       setPagination(response.pagination)
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load orders'
+      // Safely extract error message
+      let message = 'Failed to load orders'
+      
+      if (err instanceof Error) {
+        message = err.message
+      } else if (typeof err === 'object' && err !== null) {
+        const apiError = err as { error?: string; message?: string }
+        message = apiError.error || apiError.message || message
+      } else if (typeof err === 'string') {
+        message = err
+      }
+      
       setError(message)
       toast.error(message)
     } finally {

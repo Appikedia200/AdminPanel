@@ -81,7 +81,16 @@ export default function ProductsPage() {
       setSelectedProducts([])
       refetch()
     } catch (error: any) {
-      toast.error(error.error || 'Failed to update products')
+      // Safely extract error message
+      let message = 'Failed to update products'
+      if (error?.error && typeof error.error === 'string') {
+        message = error.error
+      } else if (error?.message && typeof error.message === 'string') {
+        message = error.message
+      } else if (typeof error === 'string') {
+        message = error
+      }
+      toast.error(message)
     } finally {
       setBulkUpdating(false)
     }

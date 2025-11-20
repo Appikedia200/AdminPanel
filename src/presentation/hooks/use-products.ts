@@ -23,7 +23,18 @@ export function useProducts(params?: QueryParams) {
       setProducts(response.data)
       setPagination(response.pagination)
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load products'
+      // Safely extract error message
+      let message = 'Failed to load products'
+      
+      if (err instanceof Error) {
+        message = err.message
+      } else if (typeof err === 'object' && err !== null) {
+        const apiError = err as { error?: string; message?: string }
+        message = apiError.error || apiError.message || message
+      } else if (typeof err === 'string') {
+        message = err
+      }
+      
       setError(message)
       toast.error(message)
     } finally {
@@ -41,8 +52,18 @@ export function useProducts(params?: QueryParams) {
       toast.success('Product deleted successfully')
       fetchProducts()
     } catch (err) {
-      toast.error('Failed to delete product')
-      throw err
+      // Safely extract error message
+      let message = 'Failed to delete product'
+      
+      if (err instanceof Error) {
+        message = err.message
+      } else if (typeof err === 'object' && err !== null) {
+        const apiError = err as { error?: string; message?: string }
+        message = apiError.error || apiError.message || message
+      }
+      
+      toast.error(message)
+      throw new Error(message)
     }
   }
 
