@@ -9,9 +9,7 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
-    "audit:fix": "npm audit fix",
-    "pages:deploy": "npx wrangler pages deploy out --project-name=glownatura-admin",
-    "pages:dev": "npx wrangler pages dev out"
+    "audit:fix": "npm audit fix"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -46,6 +44,7 @@
   "devDependencies": {
     "@cloudflare/kv-asset-handler": "^0.4.0",
     "@cloudflare/workers-types": "^4.20251119.0",
+    "@opennextjs/cloudflare": "^1.13.0",
     "@tailwindcss/typography": "^0.5.16",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^22.10.5",

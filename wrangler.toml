@@ -1,7 +1,3 @@
 name = "glownatura-admin"
-main = "worker.js"
 compatibility_date = "2024-11-19"
-compatibility_flags = ["nodejs_compat"]
-
-[site]
-bucket = "./.next"
+pages_build_output_dir = ".open-next/worker"
