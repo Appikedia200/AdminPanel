@@ -37,14 +37,14 @@ export function JewelryFilters({ filters, onFilterChange, onClearFilters }: Jewe
         <div className="space-y-2">
           <Label htmlFor="filter-material">Material</Label>
           <Select
-            value={filters.jewelryMaterial || ''}
-            onValueChange={(value) => onFilterChange('jewelryMaterial', value || undefined)}
+            value={filters.jewelryMaterial || 'all'}
+            onValueChange={(value) => onFilterChange('jewelryMaterial', value === 'all' ? undefined : value)}
           >
             <SelectTrigger id="filter-material">
               <SelectValue placeholder="All materials" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All materials</SelectItem>
+              <SelectItem value="all">All materials</SelectItem>
               <SelectItem value="gold">Gold</SelectItem>
               <SelectItem value="silver">Silver</SelectItem>
               <SelectItem value="platinum">Platinum</SelectItem>
@@ -62,14 +62,14 @@ export function JewelryFilters({ filters, onFilterChange, onClearFilters }: Jewe
         <div className="space-y-2">
           <Label htmlFor="filter-purity">Purity</Label>
           <Select
-            value={filters.jewelryPurity || ''}
-            onValueChange={(value) => onFilterChange('jewelryPurity', value || undefined)}
+            value={filters.jewelryPurity || 'all'}
+            onValueChange={(value) => onFilterChange('jewelryPurity', value === 'all' ? undefined : value)}
           >
             <SelectTrigger id="filter-purity">
               <SelectValue placeholder="All purities" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All purities</SelectItem>
+              <SelectItem value="all">All purities</SelectItem>
               <SelectItem value="24k">24K</SelectItem>
               <SelectItem value="22k">22K</SelectItem>
               <SelectItem value="18k">18K</SelectItem>
@@ -86,14 +86,14 @@ export function JewelryFilters({ filters, onFilterChange, onClearFilters }: Jewe
         <div className="space-y-2">
           <Label htmlFor="filter-type">Type</Label>
           <Select
-            value={filters.jewelryType || ''}
-            onValueChange={(value) => onFilterChange('jewelryType', value || undefined)}
+            value={filters.jewelryType || 'all'}
+            onValueChange={(value) => onFilterChange('jewelryType', value === 'all' ? undefined : value)}
           >
             <SelectTrigger id="filter-type">
               <SelectValue placeholder="All types" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All types</SelectItem>
+              <SelectItem value="all">All types</SelectItem>
               <SelectItem value="ring">Ring</SelectItem>
               <SelectItem value="necklace">Necklace</SelectItem>
               <SelectItem value="bracelet">Bracelet</SelectItem>
@@ -110,14 +110,14 @@ export function JewelryFilters({ filters, onFilterChange, onClearFilters }: Jewe
         <div className="space-y-2">
           <Label htmlFor="filter-gender">Gender</Label>
           <Select
-            value={filters.jewelryGender || ''}
-            onValueChange={(value) => onFilterChange('jewelryGender', value || undefined)}
+            value={filters.jewelryGender || 'all'}
+            onValueChange={(value) => onFilterChange('jewelryGender', value === 'all' ? undefined : value)}
           >
             <SelectTrigger id="filter-gender">
               <SelectValue placeholder="All genders" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All genders</SelectItem>
+              <SelectItem value="all">All genders</SelectItem>
               <SelectItem value="men">Men</SelectItem>
               <SelectItem value="women">Women</SelectItem>
               <SelectItem value="unisex">Unisex</SelectItem>
@@ -130,14 +130,14 @@ export function JewelryFilters({ filters, onFilterChange, onClearFilters }: Jewe
         <div className="space-y-2">
           <Label htmlFor="filter-stone">Stone</Label>
           <Select
-            value={filters.stoneType || ''}
-            onValueChange={(value) => onFilterChange('stoneType', value || undefined)}
+            value={filters.stoneType || 'all'}
+            onValueChange={(value) => onFilterChange('stoneType', value === 'all' ? undefined : value)}
           >
             <SelectTrigger id="filter-stone">
               <SelectValue placeholder="All stones" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All stones</SelectItem>
+              <SelectItem value="all">All stones</SelectItem>
               <SelectItem value="none">No Stone</SelectItem>
               <SelectItem value="diamond">Diamond</SelectItem>
               <SelectItem value="ruby">Ruby</SelectItem>

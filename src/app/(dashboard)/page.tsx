@@ -11,12 +11,27 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useDashboardStats, useRecentOrders, useTopProducts } from '@/presentation/hooks/use-dashboard'
 import { formatCurrency } from '@/shared/utils/format'
 import { ROUTES } from '@/infrastructure/config/constants'
+import { useAuth } from '@/presentation/context/auth.context'
 
 export default function DashboardPage() {
   const [period, setPeriod] = useState<'today' | 'week' | 'month' | 'year'>('month')
+  const { user } = useAuth()
   const { stats, loading: statsLoading } = useDashboardStats(period)
   const { orders: recentOrders, loading: ordersLoading } = useRecentOrders(5)
   const { products: topProducts, loading: productsLoading } = useTopProducts('month', 5)
+  
+  // Get first name from user's name
+  const getFirstName = (fullName: string | undefined) => {
+    if (!fullName) return 'Admin'
+    return fullName.split(' ')[0]
+  }
+  
+  const getGreeting = () => {
+    const hour = new Date().getHours()
+    if (hour < 12) return 'Good morning'
+    if (hour < 18) return 'Good afternoon'
+    return 'Good evening'
+  }
 
   if (statsLoading && !stats) {
     return (
@@ -70,7 +85,9 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground mt-2">Welcome to GlowNatura Admin Panel</p>
+          <p className="text-muted-foreground mt-2">
+            {getGreeting()}, {getFirstName(user?.name)}! Welcome back to your store.
+          </p>
         </div>
         <Select value={period} onValueChange={(value: 'today' | 'week' | 'month' | 'year') => setPeriod(value)}>
           <SelectTrigger className="w-[180px]">
