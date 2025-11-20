@@ -93,6 +93,12 @@ export default function EmailTemplatesPage() {
         {templates.map((template) => {
           const info = templateInfo[template.type] || { title: template.type, description: '' }
           
+          // Skip if template type is undefined or invalid
+          if (!template.type || template.type === 'undefined') {
+            console.warn('Invalid template:', template)
+            return null
+          }
+          
           return (
             <Card 
               key={template.type} 

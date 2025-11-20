@@ -29,8 +29,7 @@ export function useProducts(params?: QueryParams) {
     } finally {
       setLoading(false)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params])
+  }, [JSON.stringify(params)]) // Stringify params to prevent infinite loops
 
   useEffect(() => {
     fetchProducts()
