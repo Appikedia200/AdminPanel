@@ -32,14 +32,15 @@ export default function NewProductPage() {
     description: '',
     shortDescription: '',
     price: '',
-    salePrice: '',
-    costPrice: '',
+    comparePrice: '', // Changed from salePrice
     sku: '',
     stock: '',
-    lowStockThreshold: '10',
     category: '',
     keywords: '',
     ingredients: '',
+    brand: '',
+    trackInventory: true,
+    featured: false,
     status: 'draft' as 'draft' | 'active' | 'inactive',
   })
 
@@ -63,7 +64,12 @@ export default function NewProductPage() {
   }, [formData.name])
 
   const handleChange = (field: string, value: string) => {
-    setFormData({ ...formData, [field]: value })
+    // Handle boolean fields
+    if (field === 'featured' || field === 'trackInventory') {
+      setFormData({ ...formData, [field]: value === 'true' })
+    } else {
+      setFormData({ ...formData, [field]: value })
+    }
   }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,8 +89,8 @@ export default function NewProductPage() {
     setImages(images.filter((_, i) => i !== index))
   }
 
-  const handleSetDefaultImage = (index: number) => {
-    setImages(images.map((img, i) => ({ ...img, isDefault: i === index })))
+  const handleSetPrimaryImage = (index: number) => {
+    setImages(images.map((img, i) => ({ ...img, isPrimary: i === index, order: i })))
   }
 
   const handleGenerateSKU = async () => {
@@ -134,24 +140,19 @@ export default function NewProductPage() {
       const payload: Record<string, unknown> = {
         name: formData.name,
         slug: formData.slug,
-        description: {
-          full: formData.description,
-          short: formData.shortDescription || formData.description.substring(0, 160),
-        },
+        description: formData.description, // Flat field
+        shortDescription: formData.shortDescription || formData.description.substring(0, 160), // Flat field
         price: parseFloat(formData.price),
-        salePrice: formData.salePrice ? parseFloat(formData.salePrice) : undefined,
-        costPrice: formData.costPrice ? parseFloat(formData.costPrice) : undefined,
+        comparePrice: formData.comparePrice ? parseFloat(formData.comparePrice) : undefined, // Changed from salePrice
         sku: formData.sku,
         stock: parseInt(formData.stock) || 0,
-        lowStockThreshold: parseInt(formData.lowStockThreshold) || 10,
+        trackInventory: formData.trackInventory,
         category: formData.category,
-        images: images.map((img) => ({
-          url: img.url,
-          altText: img.altText || formData.name,
-          isDefault: img.isDefault,
-        })),
+        images: images, // Already in correct format: { mediaId, isPrimary, order }
         keywords: formData.keywords ? formData.keywords.split(',').map((k) => k.trim()) : [],
         ingredients: formData.ingredients ? formData.ingredients.split(',').map((i) => i.trim()) : [],
+        brand: formData.brand || undefined,
+        featured: formData.featured,
         status: formData.status,
       }
 
@@ -261,6 +262,16 @@ export default function NewProductPage() {
                 placeholder="Water, Vitamin C, Hyaluronic Acid"
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="brand">Brand</Label>
+              <Input
+                id="brand"
+                value={formData.brand}
+                onChange={(e) => handleChange('brand', e.target.value)}
+                placeholder="Brand name"
+              />
+            </div>
           </CardContent>
         </Card>
 
@@ -298,19 +309,19 @@ export default function NewProductPage() {
                   <div key={index} className="relative group border rounded-lg p-2">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={image.url}
-                      alt={image.altText}
+                      src={image._previewUrl || '/placeholder-image.png'}
+                      alt={`Product image ${index + 1}`}
                       className="w-full h-32 object-cover rounded"
                     />
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
                       {!image.isDefault && (
                         <Button
                           type="button"
-                          size="sm"
-                          variant="secondary"
-                          onClick={() => handleSetDefaultImage(index)}
-                        >
-                          Set Default
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => handleSetPrimaryImage(index)}
+                      >
+                        Set Primary
                         </Button>
                       )}
                       <Button
@@ -322,9 +333,9 @@ export default function NewProductPage() {
                         <X className="h-4 w-4" />
                       </Button>
                     </div>
-                    {image.isDefault && (
+                    {image.isPrimary && (
                       <div className="absolute top-3 left-3 bg-primary text-primary-foreground text-xs px-2 py-1 rounded">
-                        Default
+                        Primary
                       </div>
                     )}
                   </div>
@@ -347,9 +358,9 @@ export default function NewProductPage() {
             <CardTitle>Pricing</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="price">Regular Price (₦) *</Label>
+                <Label htmlFor="price">Price (₦) *</Label>
                 <Input
                   id="price"
                   type="number"
@@ -362,27 +373,18 @@ export default function NewProductPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="salePrice">Sale Price (₦)</Label>
+                <Label htmlFor="comparePrice">Compare at Price (₦)</Label>
                 <Input
-                  id="salePrice"
+                  id="comparePrice"
                   type="number"
                   step="0.01"
-                  value={formData.salePrice}
-                  onChange={(e) => handleChange('salePrice', e.target.value)}
+                  value={formData.comparePrice}
+                  onChange={(e) => handleChange('comparePrice', e.target.value)}
                   placeholder="0.00"
                 />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="costPrice">Cost Price (₦)</Label>
-                <Input
-                  id="costPrice"
-                  type="number"
-                  step="0.01"
-                  value={formData.costPrice}
-                  onChange={(e) => handleChange('costPrice', e.target.value)}
-                  placeholder="0.00"
-                />
+                <p className="text-xs text-muted-foreground">
+                  Original price for showing discounts
+                </p>
               </div>
             </div>
           </CardContent>
@@ -481,12 +483,12 @@ export default function NewProductPage() {
           isJewelryCategory={isJewelryCategory}
         />
 
-        {/* Status */}
+        {/* Status & Options */}
         <Card>
           <CardHeader>
-            <CardTitle>Status</CardTitle>
+            <CardTitle>Status & Options</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="status">Product Status</Label>
               <Select
@@ -502,6 +504,28 @@ export default function NewProductPage() {
                   <SelectItem value="inactive">Inactive</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="featured"
+                checked={formData.featured}
+                onCheckedChange={(checked) => handleChange('featured', checked ? 'true' : 'false')}
+              />
+              <Label htmlFor="featured" className="cursor-pointer">
+                Featured product (show on homepage)
+              </Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="trackInventory"
+                checked={formData.trackInventory}
+                onCheckedChange={(checked) => handleChange('trackInventory', checked ? 'true' : 'false')}
+              />
+              <Label htmlFor="trackInventory" className="cursor-pointer">
+                Track inventory
+              </Label>
             </div>
           </CardContent>
         </Card>

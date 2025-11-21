@@ -4,10 +4,10 @@ import { API_ENDPOINTS } from '@/infrastructure/config/api.config'
 import { toast } from 'sonner'
 
 export interface UploadedImage {
-  url: string
-  altText: string
-  isDefault: boolean
-  _id?: string
+  mediaId: string
+  isPrimary: boolean
+  order: number
+  _previewUrl?: string // Temporary field for preview during creation
 }
 
 interface MediaItem {
@@ -71,10 +71,10 @@ export function useImageUpload() {
         }
         
         return {
-          url: media.cloudinaryUrl,
-          altText: file.name.replace(/\.[^/.]+$/, ''),
-          isDefault: false,
-          _id: media._id,
+          mediaId: media._id,
+          isPrimary: false,
+          order: 0,
+          _previewUrl: media.cloudinaryUrl, // Store for preview
         }
       }
 
@@ -99,10 +99,9 @@ export function useImageUpload() {
       const image = await uploadImage(file)
       
       if (image) {
-        // Set first image as default
-        if (i === 0) {
-          image.isDefault = true
-        }
+        // Set first image as primary with correct order
+        image.isPrimary = i === 0
+        image.order = i
         uploadedImages.push(image)
       }
     }

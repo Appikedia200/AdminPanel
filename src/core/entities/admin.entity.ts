@@ -7,8 +7,9 @@ export class AdminEntity implements Admin {
   name: string
   email: string
   role: 'admin' | 'superadmin'
-  avatar?: string
-  isActive: boolean
+  active: boolean
+  emailVerified: boolean
+  lastLogin?: Date
   createdAt: string
   updatedAt: string
 
@@ -17,14 +18,19 @@ export class AdminEntity implements Admin {
     this.name = data.name
     this.email = data.email
     this.role = data.role
-    this.avatar = data.avatar
-    this.isActive = data.isActive
+    this.active = data.active
+    this.emailVerified = data.emailVerified
+    this.lastLogin = data.lastLogin
     this.createdAt = data.createdAt
     this.updatedAt = data.updatedAt
   }
 
   isSuperAdmin(): boolean {
     return this.role === 'superadmin'
+  }
+
+  isActive(): boolean {
+    return this.active
   }
 }
 

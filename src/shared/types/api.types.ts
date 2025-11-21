@@ -3,20 +3,15 @@ export interface LoginRequest {
   password: string
 }
 
-export interface ProductImage {
-  url: string
-  publicId: string
-  alt?: string
-}
-
-export interface ProductVariant {
-  name: string
-  value: string
-  priceAdjustment?: number
-}
-
+// Product status values aligned with backend
 export type ProductStatus = 'active' | 'inactive' | 'draft'
-export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
-export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded'
+
+// Order statuses
+export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded'
+
+// Payment statuses
+export type PaymentStatus = 'pending' | 'paid' | 'refunded'
+
+// Review statuses
 export type ReviewStatus = 'pending' | 'approved' | 'rejected'
 

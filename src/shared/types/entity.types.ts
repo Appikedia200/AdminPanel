@@ -1,4 +1,4 @@
-import type { ProductImage, ProductStatus, OrderStatus, PaymentStatus, ReviewStatus } from './api.types'
+import type { ProductStatus, OrderStatus, PaymentStatus, ReviewStatus } from './api.types'
 
 export interface BaseEntity {
   _id: string
@@ -131,30 +131,41 @@ export interface JewelryDetails {
   type?: JewelryType
 }
 
+export interface ProductImageReference {
+  mediaId: string
+  isPrimary: boolean
+  order: number
+}
+
 export interface Product extends BaseEntity {
   name: string
   slug: string
-  description: string
-  shortDescription?: string
+  description: string // Full description - flat field
+  shortDescription?: string // Short description - flat field
   sku: string
   price: number
-  salePrice?: number
-  costPrice?: number
+  comparePrice?: number // Original price for comparison (not salePrice)
   stock: number
-  lowStockThreshold: number
+  reservedStock?: number
+  trackInventory: boolean
   category: string | Category
-  images: ProductImage[]
+  images: ProductImageReference[] // Media references, not raw URLs
   featured: boolean
-  status: ProductStatus
-  tags?: string[]
-  metaTitle?: string
-  metaDescription?: string
-  weight?: number
-  dimensions?: {
-    length?: number
-    width?: number
-    height?: number
+  status: ProductStatus // 'active' | 'inactive' | 'draft'
+  keywords?: string[]
+  ingredients?: string[]
+  concerns?: string[]
+  skinType?: string[]
+  brand?: string
+  seo?: {
+    metaTitle: string
+    metaDescription: string
+    keywords: string[]
   }
+  viewCount?: number
+  totalOrders?: number
+  averageRating?: number
+  totalReviews?: number
   jewelry?: JewelryDetails
 }
 
@@ -163,9 +174,9 @@ export interface Category extends BaseEntity {
   slug: string
   description?: string
   image?: string
-  parent?: string | Category
   displayOrder: number
-  productCount: number
+  active: boolean // Use this field for active/inactive status
+  productCount?: number
 }
 
 export interface Review extends BaseEntity {
@@ -223,20 +234,23 @@ export interface Admin extends BaseEntity {
   name: string
   email: string
   role: 'admin' | 'superadmin'
-  avatar?: string
-  isActive: boolean
+  active: boolean // Use this field for active/inactive status
+  emailVerified: boolean
+  lastLogin?: Date
 }
 
 export interface Media extends BaseEntity {
-  url: string
-  publicId: string
   filename: string
-  mimetype: string
-  size: number
+  originalName: string
+  cloudinaryUrl: string // Full URL to display
+  cloudinaryPublicId: string
+  fileSize: number
+  mimeType: string
   width?: number
   height?: number
-  alt?: string
-  usedIn: string[]
+  altText?: string
+  title?: string
+  uploadedBy: string
 }
 
 export interface Settings {

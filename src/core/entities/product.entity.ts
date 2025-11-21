@@ -2,6 +2,8 @@ import type { Product } from '@/shared/types/entity.types'
 
 export type { Product }
 
+import type { ProductImageReference } from '@/shared/types/entity.types'
+
 export class ProductEntity implements Product {
   _id: string
   name: string
@@ -10,19 +12,28 @@ export class ProductEntity implements Product {
   shortDescription?: string
   sku: string
   price: number
-  salePrice?: number
-  costPrice?: number
+  comparePrice?: number
   stock: number
-  lowStockThreshold: number
+  reservedStock?: number
+  trackInventory: boolean
   category: string
-  images: Array<{ url: string; publicId: string; alt?: string }>
+  images: ProductImageReference[]
   featured: boolean
   status: 'active' | 'inactive' | 'draft'
-  tags?: string[]
-  metaTitle?: string
-  metaDescription?: string
-  weight?: number
-  dimensions?: { length?: number; width?: number; height?: number }
+  keywords?: string[]
+  ingredients?: string[]
+  concerns?: string[]
+  skinType?: string[]
+  brand?: string
+  seo?: {
+    metaTitle: string
+    metaDescription: string
+    keywords: string[]
+  }
+  viewCount?: number
+  totalOrders?: number
+  averageRating?: number
+  totalReviews?: number
   createdAt: string
   updatedAt: string
 
@@ -34,38 +45,43 @@ export class ProductEntity implements Product {
     this.shortDescription = data.shortDescription
     this.sku = data.sku
     this.price = data.price
-    this.salePrice = data.salePrice
-    this.costPrice = data.costPrice
+    this.comparePrice = data.comparePrice
     this.stock = data.stock
-    this.lowStockThreshold = data.lowStockThreshold
+    this.reservedStock = data.reservedStock
+    this.trackInventory = data.trackInventory
     this.category = typeof data.category === 'string' ? data.category : data.category._id
     this.images = data.images
     this.featured = data.featured
     this.status = data.status
-    this.tags = data.tags
-    this.metaTitle = data.metaTitle
-    this.metaDescription = data.metaDescription
-    this.weight = data.weight
-    this.dimensions = data.dimensions
+    this.keywords = data.keywords
+    this.ingredients = data.ingredients
+    this.concerns = data.concerns
+    this.skinType = data.skinType
+    this.brand = data.brand
+    this.seo = data.seo
+    this.viewCount = data.viewCount
+    this.totalOrders = data.totalOrders
+    this.averageRating = data.averageRating
+    this.totalReviews = data.totalReviews
     this.createdAt = data.createdAt
     this.updatedAt = data.updatedAt
   }
 
   isLowStock(): boolean {
-    return this.stock <= this.lowStockThreshold
+    return this.stock <= 10 // Default threshold
   }
 
   isOnSale(): boolean {
-    return this.salePrice !== undefined && this.salePrice < this.price
+    return this.comparePrice !== undefined && this.comparePrice > this.price
   }
 
   getDiscountPercentage(): number {
-    if (!this.isOnSale() || !this.salePrice) return 0
-    return Math.round(((this.price - this.salePrice) / this.price) * 100)
+    if (!this.isOnSale() || !this.comparePrice) return 0
+    return Math.round(((this.comparePrice - this.price) / this.comparePrice) * 100)
   }
 
   getActivePrice(): number {
-    return this.salePrice || this.price
+    return this.price
   }
 }
 
