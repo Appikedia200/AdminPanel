@@ -31,8 +31,8 @@ export class OrderEntity implements Order {
   tax: number
   shippingCost: number
   total: number
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
-  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded'
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded'
+  paymentStatus: 'pending' | 'paid' | 'refunded'
   paymentMethod: string
   notes?: string
   trackingNumber?: string

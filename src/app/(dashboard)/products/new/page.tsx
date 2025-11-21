@@ -9,6 +9,7 @@ import { Input } from '@/presentation/components/ui/input'
 import { Label } from '@/presentation/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/presentation/components/ui/select'
+import { Checkbox } from '@/presentation/components/ui/checkbox'
 import { httpClient } from '@/infrastructure/api/client'
 import { API_ENDPOINTS } from '@/infrastructure/config/api.config'
 import { useCategories } from '@/presentation/hooks/use-categories'
@@ -314,7 +315,7 @@ export default function NewProductPage() {
                       className="w-full h-32 object-cover rounded"
                     />
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
-                      {!image.isDefault && (
+                      {!image.isPrimary && (
                         <Button
                           type="button"
                         size="sm"
@@ -429,16 +430,6 @@ export default function NewProductPage() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="lowStockThreshold">Low Stock Alert</Label>
-                <Input
-                  id="lowStockThreshold"
-                  type="number"
-                  value={formData.lowStockThreshold}
-                  onChange={(e) => handleChange('lowStockThreshold', e.target.value)}
-                  placeholder="10"
-                />
-              </div>
             </div>
           </CardContent>
         </Card>

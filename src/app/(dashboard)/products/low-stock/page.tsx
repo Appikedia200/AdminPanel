@@ -130,10 +130,10 @@ export default function LowStockProductsPage() {
                     <TableRow key={product._id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          {product.images[0]?.url && (
+                          {product.images[0] && (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
-                              src={product.images[0].url}
+                              src={(product.images[0] as any).cloudinaryUrl || '/placeholder-image.png'}
                               alt={product.name}
                               className="h-10 w-10 rounded object-cover"
                             />
@@ -153,7 +153,7 @@ export default function LowStockProductsPage() {
                           {product.stock}
                         </span>
                       </TableCell>
-                      <TableCell>{product.lowStockThreshold}</TableCell>
+                      <TableCell>{10}</TableCell>
                       <TableCell>
                         <Badge
                           variant={
@@ -187,10 +187,10 @@ export default function LowStockProductsPage() {
             {products.map((product) => (
               <Card key={product._id} className="p-4 border-l-4 border-l-amber-500">
                 <div className="flex gap-4">
-                  {product.images[0]?.url && (
+                  {product.images[0] && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={product.images[0].url}
+                      src={(product.images[0] as any).cloudinaryUrl || '/placeholder-image.png'}
                       alt={product.name}
                       className="h-20 w-20 rounded object-cover"
                     />
@@ -224,7 +224,7 @@ export default function LowStockProductsPage() {
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Threshold:</span>
-                        <span className="font-medium">{product.lowStockThreshold}</span>
+                        <span className="font-medium">{10}</span>
                       </div>
                     </div>
                     <Link href={ROUTES.PRODUCTS_EDIT(product._id)} className="mt-3 block">

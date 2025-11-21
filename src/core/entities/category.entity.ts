@@ -8,9 +8,9 @@ export class CategoryEntity implements Category {
   slug: string
   description?: string
   image?: string
-  parent?: string
   displayOrder: number
-  productCount: number
+  active: boolean
+  productCount?: number
   createdAt: string
   updatedAt: string
 
@@ -20,15 +20,15 @@ export class CategoryEntity implements Category {
     this.slug = data.slug
     this.description = data.description
     this.image = data.image
-    this.parent = typeof data.parent === 'string' ? data.parent : data.parent?._id
     this.displayOrder = data.displayOrder
+    this.active = data.active
     this.productCount = data.productCount
     this.createdAt = data.createdAt
     this.updatedAt = data.updatedAt
   }
 
-  isTopLevel(): boolean {
-    return !this.parent
+  isActive(): boolean {
+    return this.active
   }
 }
 

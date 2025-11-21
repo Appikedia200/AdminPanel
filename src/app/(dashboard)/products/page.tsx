@@ -204,10 +204,10 @@ export default function ProductsPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        {product.images[0]?.url && (
+                        {product.images[0] && (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
-                            src={product.images[0].url}
+                            src={(product.images[0] as any).cloudinaryUrl || '/placeholder-image.png'}
                             alt={product.name}
                             className="h-10 w-10 rounded object-cover"
                           />
@@ -225,7 +225,7 @@ export default function ProductsPage() {
                     <TableCell>
                       <span
                         className={
-                          product.stock <= product.lowStockThreshold
+                          product.stock <= 10
                             ? 'text-destructive font-medium'
                             : ''
                         }
@@ -288,10 +288,10 @@ export default function ProductsPage() {
           products.map((product) => (
             <Card key={product._id} className="p-4">
               <div className="flex gap-4">
-                {product.images[0]?.url && (
+                {product.images[0] && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={product.images[0].url}
+                    src={(product.images[0] as any).cloudinaryUrl || '/placeholder-image.png'}
                     alt={product.name}
                     className="h-20 w-20 rounded object-cover"
                   />
@@ -334,7 +334,7 @@ export default function ProductsPage() {
                       <span className="text-muted-foreground">Stock: </span>
                       <span
                         className={
-                          product.stock <= product.lowStockThreshold
+                          product.stock <= 10
                             ? 'text-destructive font-medium'
                             : 'font-medium'
                         }
