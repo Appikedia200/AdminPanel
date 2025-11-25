@@ -14,6 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/presentation/components/u
 import { AuthServiceImpl } from '@/infrastructure/repositories/auth.service.impl'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import { ROUTES } from '@/infrastructure/config/constants'
 
 interface AdminHeaderProps {
   onMenuClick: () => void
@@ -119,7 +120,7 @@ export function AdminHeader({ onMenuClick, user }: AdminHeaderProps) {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push(ROUTES.PROFILE)}>
             <User className="mr-2 h-4 w-4" />
             <span>Profile</span>
           </DropdownMenuItem>

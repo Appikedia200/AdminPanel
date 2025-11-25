@@ -23,6 +23,7 @@ export const ROUTES = {
   HOME: '/',
   LOGIN: '/login',
   DASHBOARD: '/',
+  PROFILE: '/profile',
   PRODUCTS: '/products',
   PRODUCTS_NEW: '/products/new',
   PRODUCTS_EDIT: (id: string) => `/products/${id}/edit`,
