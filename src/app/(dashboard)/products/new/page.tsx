@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Save, Loader2, Upload, X, Image as ImageIcon } from 'lucide-react'
+import { ArrowLeft, Save, Loader2, Upload, X, Image as ImageIcon, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/presentation/components/ui/button'
 import { Input } from '@/presentation/components/ui/input'
@@ -10,6 +10,7 @@ import { Label } from '@/presentation/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/presentation/components/ui/select'
 import { Checkbox } from '@/presentation/components/ui/checkbox'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/presentation/components/ui/tooltip'
 import { httpClient } from '@/infrastructure/api/client'
 import { API_ENDPOINTS } from '@/infrastructure/config/api.config'
 import { useCategories } from '@/presentation/hooks/use-categories'
@@ -152,20 +153,21 @@ export default function NewProductPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href={ROUTES.PRODUCTS}>
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold">Add New Product</h1>
-          <p className="text-muted-foreground mt-1">Create a new product listing</p>
+    <TooltipProvider>
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Link href={ROUTES.PRODUCTS}>
+            <Button variant="ghost" size="icon">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold">Add New Product</h1>
+            <p className="text-muted-foreground mt-1">Create a new product listing</p>
+          </div>
         </div>
-      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information */}
         <Card>
           <CardHeader>
@@ -174,78 +176,159 @@ export default function NewProductPage() {
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="name">Product Name *</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="name">Product Name *</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">Full product name including brand, variant, and size. Example: &quot;CeraVe Moisturizing Lotion 16oz&quot;</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => handleChange('name', e.target.value)}
-                  placeholder="e.g., Vitamin C Serum, Gold Chain, Smart Watch"
+                  placeholder="e.g., CeraVe Moisturizing Lotion 16oz, Gold Chain 18k, Apple Watch Series 9"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="slug">URL Slug *</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="slug">URL Slug *</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">Auto-generated from product name. Used in product page URL. SEO-friendly format.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <Input
                   id="slug"
                   value={formData.slug}
                   onChange={(e) => handleChange('slug', e.target.value)}
-                  placeholder="vitamin-c-serum"
+                  placeholder="Auto-generated (e.g., cerave-moisturizing-lotion-16oz)"
+                  className="bg-muted/50"
                   required
                 />
+                <p className="text-xs text-muted-foreground">
+                  URL: glownaturas.com/products/{formData.slug || 'product-slug'}
+                </p>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description *</Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="description">Description *</Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs">Detailed product description including benefits, how to use, ingredients, suitable for, and size.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
               <textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => handleChange('description', e.target.value)}
-                rows={4}
+                rows={6}
                 className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                placeholder="Detailed product description..."
+                placeholder="Example: This gentle, non-comedogenic moisturizer contains ceramides and hyaluronic acid to help restore and maintain skin's natural protective barrier. Suitable for dry to normal skin. Apply daily after cleansing..."
                 required
               />
+              <p className="text-xs text-muted-foreground">
+                {formData.description.length} characters
+              </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="shortDescription">Short Description</Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="shortDescription">Short Description</Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs">Brief one-line description for product listings and search results. Max 160 characters recommended.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
               <Input
                 id="shortDescription"
                 value={formData.shortDescription}
                 onChange={(e) => handleChange('shortDescription', e.target.value)}
-                placeholder="Brief description for listings"
+                placeholder="e.g., Hydrating lotion for dry skin with ceramides and hyaluronic acid"
+                maxLength={160}
               />
+              <p className="text-xs text-muted-foreground">
+                {formData.shortDescription.length}/160 characters
+              </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="keywords">Keywords (comma-separated)</Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="keywords">Keywords (comma-separated)</Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs">Search keywords to help customers find this product. Separate with commas.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
               <Input
                 id="keywords"
                 value={formData.keywords}
                 onChange={(e) => handleChange('keywords', e.target.value)}
-                placeholder="vitamin c, serum, brightening"
+                placeholder="e.g., moisturizer, dry skin, hydration, ceramides, face lotion"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="ingredients">Ingredients (comma-separated)</Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="ingredients">Ingredients (comma-separated)</Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs">Key ingredients list. Separate with commas. For skincare products only.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
               <Input
                 id="ingredients"
                 value={formData.ingredients}
                 onChange={(e) => handleChange('ingredients', e.target.value)}
-                placeholder="Water, Vitamin C, Hyaluronic Acid"
+                placeholder="e.g., Water, Glycerin, Ceramides, Hyaluronic Acid, Niacinamide"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="brand">Brand</Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="brand">Brand</Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs">Product brand or manufacturer name.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
               <Input
                 id="brand"
                 value={formData.brand}
                 onChange={(e) => handleChange('brand', e.target.value)}
-                placeholder="Brand name"
+                placeholder="e.g., CeraVe, Neutrogena, Nivea"
               />
             </div>
           </CardContent>
@@ -336,30 +419,54 @@ export default function NewProductPage() {
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="price">Price (₦) *</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="price">Price (₦) *</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">Current selling price. This is what customers will pay.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <Input
                   id="price"
                   type="number"
                   step="0.01"
+                  min="0"
                   value={formData.price}
                   onChange={(e) => handleChange('price', e.target.value)}
-                  placeholder="0.00"
+                  placeholder="e.g., 5000.00"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="comparePrice">Compare at Price (₦)</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="comparePrice">Compare at Price (₦)</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">Original price before discount. Shows savings to customers. Leave blank if no discount.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <Input
                   id="comparePrice"
                   type="number"
                   step="0.01"
+                  min="0"
                   value={formData.comparePrice}
                   onChange={(e) => handleChange('comparePrice', e.target.value)}
-                  placeholder="0.00"
+                  placeholder="e.g., 8000.00 (optional)"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Original price for showing discounts
+                  {formData.comparePrice && formData.price && parseFloat(formData.comparePrice) > parseFloat(formData.price)
+                    ? `Save ₦${(parseFloat(formData.comparePrice) - parseFloat(formData.price)).toLocaleString()} (${Math.round(((parseFloat(formData.comparePrice) - parseFloat(formData.price)) / parseFloat(formData.comparePrice)) * 100)}% off)`
+                    : 'Original price for showing discounts'}
                 </p>
               </div>
             </div>
@@ -374,13 +481,23 @@ export default function NewProductPage() {
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-3">
               <div className="space-y-2">
-                <Label htmlFor="sku">SKU *</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="sku">SKU *</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">Stock Keeping Unit - unique identifier for inventory tracking. Click Generate for automatic SKU.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <div className="flex gap-2">
                   <Input
                     id="sku"
                     value={formData.sku}
                     onChange={(e) => handleChange('sku', e.target.value)}
-                    placeholder="PROD-001"
+                    placeholder="Click Generate or enter manually"
                     required
                   />
                   <Button
@@ -394,15 +511,32 @@ export default function NewProductPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="stock">Stock Quantity *</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="stock">Stock Quantity *</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">Current available stock. Low stock alert triggers at 10 or below. Set to 0 if out of stock.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <Input
                   id="stock"
                   type="number"
+                  min="0"
                   value={formData.stock}
                   onChange={(e) => handleChange('stock', e.target.value)}
-                  placeholder="0"
+                  placeholder="e.g., 100"
                   required
                 />
+                {formData.stock && parseInt(formData.stock) === 0 && (
+                  <p className="text-xs text-destructive">⚠️ Product will be marked as out of stock</p>
+                )}
+                {formData.stock && parseInt(formData.stock) > 0 && parseInt(formData.stock) <= 10 && (
+                  <p className="text-xs text-orange-500">⚠️ Low stock - will show warning to customers</p>
+                )}
               </div>
 
             </div>
@@ -513,7 +647,8 @@ export default function NewProductPage() {
             )}
           </Button>
         </div>
-      </form>
-    </div>
+        </form>
+      </div>
+    </TooltipProvider>
   )
 }

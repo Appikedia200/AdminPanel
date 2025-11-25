@@ -49,32 +49,27 @@ export default function ProductsPage() {
     }
   }
 
-  const handleBulkStatusUpdate = async (status: 'active' | 'inactive') => {
-    if (!confirm(`${status === 'active' ? 'Activate' : 'Deactivate'} ${selectedProducts.length} products?`)) {
+  const handleBulkStatusUpdate = async (status: 'active' | 'inactive' | 'draft') => {
+    if (!confirm(`${status === 'active' ? 'Activate' : status === 'inactive' ? 'Deactivate' : 'Mark as Draft'} ${selectedProducts.length} products?`)) {
       return
     }
 
     setBulkUpdating(true)
     try {
-      await httpClient.put(API_ENDPOINTS.products.bulkStatus, {
-        productIds: selectedProducts,
+      const response: any = await httpClient.put(API_ENDPOINTS.products.bulkStatus, {
+        ids: selectedProducts, // Backend expects 'ids', not 'productIds'
         status
       })
       
-      toast.success(`${selectedProducts.length} products ${status === 'active' ? 'activated' : 'deactivated'}`)
+      // Display backend success message if available
+      const message = response?.data?.message || `${selectedProducts.length} products ${status === 'active' ? 'activated' : status === 'inactive' ? 'deactivated' : 'marked as draft'}`
+      toast.success(message)
       setSelectedProducts([])
       refetch()
     } catch (error: any) {
-      // Safely extract error message
-      let message = 'Failed to update products'
-      if (error?.error && typeof error.error === 'string') {
-        message = error.error
-      } else if (error?.message && typeof error.message === 'string') {
-        message = error.message
-      } else if (typeof error === 'string') {
-        message = error
-      }
-      toast.error(message)
+      // Display specific backend error message
+      const errorMessage = error?.response?.data?.error || error?.error || error?.message || 'Failed to update products'
+      toast.error(errorMessage)
     } finally {
       setBulkUpdating(false)
     }
@@ -198,15 +193,25 @@ export default function ProductsPage() {
                     </TableCell>
                     <TableCell>{formatCurrency(product.price)}</TableCell>
                     <TableCell>
-                      <span
-                        className={
-                          product.stock <= 10
-                            ? 'text-destructive font-medium'
-                            : ''
-                        }
-                      >
-                        {product.stock}
-                      </span>
+                      <div className="flex flex-col gap-1">
+                        <span
+                          className={
+                            product.stock === 0
+                              ? 'text-destructive font-bold'
+                              : product.stock <= 10
+                              ? 'text-destructive font-medium'
+                              : 'font-medium'
+                          }
+                        >
+                          {product.stock}
+                        </span>
+                        {product.stock === 0 && (
+                          <Badge variant="destructive" className="text-xs">Out of Stock</Badge>
+                        )}
+                        {product.stock > 0 && product.stock <= 10 && (
+                          <Badge variant="outline" className="text-xs border-orange-500 text-orange-500">Low Stock</Badge>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -305,17 +310,25 @@ export default function ProductsPage() {
                       <span className="text-muted-foreground">Price: </span>
                       <span className="font-medium">{formatCurrency(product.price)}</span>
                     </div>
-                    <div>
+                    <div className="flex items-center gap-2">
                       <span className="text-muted-foreground">Stock: </span>
                       <span
                         className={
-                          product.stock <= 10
+                          product.stock === 0
+                            ? 'text-destructive font-bold'
+                            : product.stock <= 10
                             ? 'text-destructive font-medium'
                             : 'font-medium'
                         }
                       >
                         {product.stock}
                       </span>
+                      {product.stock === 0 && (
+                        <Badge variant="destructive" className="text-xs">Out of Stock</Badge>
+                      )}
+                      {product.stock > 0 && product.stock <= 10 && (
+                        <Badge variant="outline" className="text-xs border-orange-500 text-orange-500">Low</Badge>
+                      )}
                     </div>
                     <Badge
                       variant={
@@ -368,6 +381,15 @@ export default function ProductsPage() {
             disabled={bulkUpdating}
           >
             Deactivate
+          </Button>
+
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => handleBulkStatusUpdate('draft')}
+            disabled={bulkUpdating}
+          >
+            Mark as Draft
           </Button>
           
           <Button
