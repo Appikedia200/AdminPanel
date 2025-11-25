@@ -275,3 +275,23 @@ export interface Settings {
   }
 }
 
+export type HomepageSectionType = 
+  | 'featured' 
+  | 'new_arrivals' 
+  | 'back_in_stock' 
+  | 'trending' 
+  | 'best_sellers'
+
+export interface HomepageSection extends BaseEntity {
+  type: HomepageSectionType  // Virtual field (frontend-friendly)
+  sectionType: HomepageSectionType  // Original backend field
+  title: string
+  subtitle?: string
+  products: (string | Product)[]  // Can be IDs or populated products
+  maxProducts: number
+  displayOrder: number
+  active: boolean  // Virtual field (frontend-friendly)
+  isActive: boolean  // Original backend field
+  autoUpdate: boolean
+}
+

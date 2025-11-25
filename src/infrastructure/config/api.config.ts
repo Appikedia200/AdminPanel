@@ -100,4 +100,17 @@ export const API_ENDPOINTS = {
     topProducts: '/api/dashboard/top-products',
     salesData: '/api/dashboard/sales-data',
   },
+
+  // Homepage Sections
+  homepageSections: {
+    list: '/api/homepage-sections',
+    get: (type: string) => `/api/homepage-sections/${type}`,
+    create: '/api/homepage-sections',
+    update: (type: string) => `/api/homepage-sections/${type}`,
+    delete: (type: string) => `/api/homepage-sections/${type}`,
+    addProducts: (type: string) => `/api/homepage-sections/${type}/products`,
+    removeProducts: (type: string) => `/api/homepage-sections/${type}/products`,
+    reorder: (type: string) => `/api/homepage-sections/${type}/reorder`,
+    toggle: (type: string) => `/api/homepage-sections/${type}/toggle`,
+  },
 } as const
