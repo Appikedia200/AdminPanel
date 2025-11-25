@@ -30,8 +30,13 @@ export class AuthServiceImpl implements IAuthService {
 
   async logout(): Promise<ApiResponse<void>> {
     try {
+      // Try to call backend logout endpoint
       await httpClient.post<ApiResponse<void>>(API_ENDPOINTS.auth.logout)
+    } catch (error) {
+      // ✅ Professional: Log error but don't fail - always logout locally
+      console.error('Backend logout failed, proceeding with local logout:', error)
     } finally {
+      // ✅ ALWAYS remove token, even if backend call fails
       Cookies.remove(AUTH_TOKEN_KEY)
     }
 

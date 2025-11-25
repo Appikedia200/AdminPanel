@@ -1,6 +1,6 @@
 'use client'
 
-import { Menu, Bell, LogOut, User } from 'lucide-react'
+import { Menu, Bell, LogOut, User, X } from 'lucide-react'
 import { Button } from '@/presentation/components/ui/button'
 import {
   DropdownMenu,
@@ -15,6 +15,8 @@ import { AuthServiceImpl } from '@/infrastructure/repositories/auth.service.impl
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { ROUTES } from '@/infrastructure/config/constants'
+import { useNotifications } from '@/presentation/hooks/use-notifications'
+import { formatDistanceToNow } from 'date-fns'
 
 interface AdminHeaderProps {
   onMenuClick: () => void
@@ -28,6 +30,16 @@ interface AdminHeaderProps {
 export function AdminHeader({ onMenuClick, user }: AdminHeaderProps) {
   const router = useRouter()
   const authService = new AuthServiceImpl()
+  
+  // ✅ Professional: Use real notifications hook
+  const { 
+    notifications, 
+    unreadCount, 
+    isLoading: notificationsLoading,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+  } = useNotifications()
 
   const handleLogout = async () => {
     try {
@@ -49,6 +61,22 @@ export function AdminHeader({ onMenuClick, user }: AdminHeaderProps) {
       .slice(0, 2)
   }
 
+  const handleNotificationClick = (notification: any) => {
+    // Mark as read
+    if (!notification.isRead) {
+      markAsRead(notification._id)
+    }
+    
+    // Navigate based on notification type
+    if (notification.type === 'review' && notification.relatedId) {
+      router.push(ROUTES.REVIEWS)
+    } else if (notification.type === 'order' && notification.relatedId) {
+      router.push(ROUTES.ORDERS_DETAIL(notification.relatedId))
+    } else if (notification.type === 'product' && notification.relatedId) {
+      router.push(ROUTES.PRODUCTS_EDIT(notification.relatedId))
+    }
+  }
+
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 lg:px-6">
       <Button
@@ -63,36 +91,88 @@ export function AdminHeader({ onMenuClick, user }: AdminHeaderProps) {
 
       <div className="flex-1" />
 
+      {/* ✅ Professional: Real Notifications */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-destructive-foreground">
-              1
-            </span>
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-destructive-foreground">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
             <span className="sr-only">Notifications</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-80" align="end" forceMount>
-          <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+        <DropdownMenuContent className="w-96" align="end" forceMount>
+          <div className="flex items-center justify-between px-4 py-2">
+            <DropdownMenuLabel className="p-0">Notifications</DropdownMenuLabel>
+            {unreadCount > 0 && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-auto p-0 text-xs"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  markAllAsRead()
+                }}
+              >
+                Mark all as read
+              </Button>
+            )}
+          </div>
           <DropdownMenuSeparator />
           <div className="max-h-96 overflow-y-auto">
-            <DropdownMenuItem className="flex flex-col items-start py-3 cursor-pointer">
-              <div className="flex items-start gap-3 w-full">
-                <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium">New pending review</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    A customer left a review for your product
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">2 hours ago</p>
-                </div>
+            {notificationsLoading ? (
+              <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
+                Loading notifications...
               </div>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="flex items-center justify-center text-sm text-muted-foreground py-2">
-              No more notifications
-            </DropdownMenuItem>
+            ) : notifications.length === 0 ? (
+              <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
+                No notifications
+              </div>
+            ) : (
+              notifications.map((notification) => (
+                <div key={notification._id} className="relative group">
+                  <DropdownMenuItem 
+                    className="flex flex-col items-start py-3 cursor-pointer pr-8"
+                    onClick={() => handleNotificationClick(notification)}
+                  >
+                    <div className="flex items-start gap-3 w-full">
+                      {!notification.isRead && (
+                        <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0" />
+                      )}
+                      {notification.isRead && (
+                        <div className="h-2 w-2 rounded-full bg-transparent mt-2 flex-shrink-0" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm ${!notification.isRead ? 'font-medium' : ''}`}>
+                          {notification.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                          {notification.message}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                        </p>
+                      </div>
+                    </div>
+                  </DropdownMenuItem>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      deleteNotification(notification._id)
+                    }}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                  <DropdownMenuSeparator />
+                </div>
+              ))
+            )}
           </div>
         </DropdownMenuContent>
       </DropdownMenu>

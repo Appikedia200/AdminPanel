@@ -5,6 +5,7 @@ import { AdminSidebar } from '@/presentation/components/layout/admin-sidebar'
 import { AdminHeader } from '@/presentation/components/layout/admin-header'
 import { Sheet, SheetContent } from '@/presentation/components/ui/sheet'
 import { useAuthGuard } from '@/presentation/hooks/use-auth-guard'
+import { useAuth } from '@/presentation/context/auth.context'
 
 export default function DashboardLayout({
   children,
@@ -13,6 +14,9 @@ export default function DashboardLayout({
 }) {
   useAuthGuard()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  
+  // ✅ Professional: Get user data from Auth Context
+  const { user } = useAuth()
 
   return (
     <div className="flex min-h-screen">
@@ -30,7 +34,10 @@ export default function DashboardLayout({
 
       {/* Main Content - With left margin to account for fixed sidebar */}
       <div className="flex flex-1 flex-col lg:pl-64">
-        <AdminHeader onMenuClick={() => setSidebarOpen(true)} />
+        <AdminHeader 
+          onMenuClick={() => setSidebarOpen(true)} 
+          user={user || undefined} // ✅ Pass actual user data from context
+        />
         <main className="flex-1 p-4 lg:p-6">
           {children}
         </main>

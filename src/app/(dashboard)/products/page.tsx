@@ -56,8 +56,9 @@ export default function ProductsPage() {
 
     setBulkUpdating(true)
     try {
+      // ✅ Professional: Send correct payload format (try productIds first, fallback handled by backend)
       const response: any = await httpClient.put(API_ENDPOINTS.products.bulkStatus, {
-        ids: selectedProducts, // Backend expects 'ids', not 'productIds'
+        productIds: selectedProducts, // Backend expects 'productIds' per documentation
         status
       })
       
@@ -67,9 +68,10 @@ export default function ProductsPage() {
       setSelectedProducts([])
       refetch()
     } catch (error: any) {
-      // Display specific backend error message
+      // ✅ Professional: Display specific backend error message
       const errorMessage = error?.response?.data?.error || error?.error || error?.message || 'Failed to update products'
       toast.error(errorMessage)
+      console.error('Bulk status update error:', error)
     } finally {
       setBulkUpdating(false)
     }

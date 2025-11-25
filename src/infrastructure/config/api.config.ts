@@ -113,4 +113,13 @@ export const API_ENDPOINTS = {
     reorder: (type: string) => `/api/homepage-sections/${type}/reorder`,
     toggle: (type: string) => `/api/homepage-sections/${type}/toggle`,
   },
+
+  // Notifications
+  notifications: {
+    list: '/api/notifications',
+    unreadCount: '/api/notifications/unread-count',
+    markAsRead: (id: string) => `/api/notifications/${id}/read`,
+    markAllAsRead: '/api/notifications/read-all',
+    delete: (id: string) => `/api/notifications/${id}`,
+  },
 } as const
