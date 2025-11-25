@@ -44,7 +44,7 @@ function SortableProductItem({ product, onRemove }: { product: Product; onRemove
       style={style}
       className="flex items-center gap-3 p-3 bg-card border rounded-lg"
     >
-      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
+      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing flex-shrink-0">
         <GripVertical className="h-5 w-5 text-muted-foreground" />
       </div>
       
@@ -52,18 +52,18 @@ function SortableProductItem({ product, onRemove }: { product: Product; onRemove
       <img
         src={imageUrl}
         alt={product.name}
-        className="h-12 w-12 rounded object-cover"
+        className="h-12 w-12 rounded object-cover flex-shrink-0"
       />
       
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 overflow-hidden">
         <p className="font-medium truncate">{product.name}</p>
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-muted-foreground">{formatCurrency(product.price)}</span>
+        <div className="flex items-center gap-2 text-sm flex-wrap">
+          <span className="text-muted-foreground whitespace-nowrap">{formatCurrency(product.price)}</span>
           {product.stock === 0 && (
-            <Badge variant="destructive" className="text-xs">Out of Stock</Badge>
+            <Badge variant="destructive" className="text-xs whitespace-nowrap">Out of Stock</Badge>
           )}
           {product.stock > 0 && product.stock <= 10 && (
-            <Badge variant="outline" className="text-xs border-orange-500 text-orange-500">Low Stock</Badge>
+            <Badge variant="outline" className="text-xs border-orange-500 text-orange-500 whitespace-nowrap">Low Stock</Badge>
           )}
         </div>
       </div>
@@ -73,6 +73,7 @@ function SortableProductItem({ product, onRemove }: { product: Product; onRemove
         variant="ghost"
         size="sm"
         onClick={onRemove}
+        className="flex-shrink-0"
       >
         <X className="h-4 w-4" />
       </Button>
@@ -269,15 +270,17 @@ function ProductSelectionModal({
                       <img
                         src={imageUrl}
                         alt={product.name}
-                        className="h-12 w-12 rounded object-cover"
+                        className="h-12 w-12 rounded object-cover flex-shrink-0"
                       />
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 overflow-hidden">
                         <p className="font-medium truncate">{product.name}</p>
-                        <p className="text-sm text-muted-foreground">{formatCurrency(product.price)}</p>
+                        <p className="text-sm text-muted-foreground truncate">{formatCurrency(product.price)}</p>
                       </div>
-                      {isSelected && (
-                        <Badge variant="default">Selected</Badge>
-                      )}
+                      <div className="flex-shrink-0">
+                        {isSelected && (
+                          <Badge variant="default">Selected</Badge>
+                        )}
+                      </div>
                     </div>
                   )
                 })}
