@@ -74,8 +74,12 @@
   * {
     @apply border-border;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    overflow-x: hidden;
   }
   h1 {
     @apply text-3xl font-bold tracking-tight lg:text-4xl;
@@ -97,6 +101,19 @@
   }
   .touch-target {
     @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Smooth scrolling and prevent layout shifts */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+  
+  /* Prevent content jumping during navigation */
+  @supports (scrollbar-gutter: stable) {
+    html {
+      overflow-y: auto;
+      scrollbar-gutter: stable;
+    }
   }
 }
 
