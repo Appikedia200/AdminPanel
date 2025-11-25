@@ -186,6 +186,13 @@ export default function EditProductPage() {
     setLoading(true)
 
     try {
+      // ✅ CRITICAL FIX: Ensure images array only contains mediaId STRING, not objects
+      const cleanImages = images.map(img => ({
+        mediaId: typeof img.mediaId === 'string' ? img.mediaId : String(img.mediaId),
+        isPrimary: img.isPrimary,
+        order: img.order
+      }))
+
       const payload: Record<string, unknown> = {
         name: formData.name,
         slug: formData.slug,
@@ -197,7 +204,7 @@ export default function EditProductPage() {
         stock: parseInt(formData.stock) || 0,
         trackInventory: formData.trackInventory,
         category: formData.category,
-        images: images,
+        images: cleanImages, // ✅ Use cleaned images array
         keywords: formData.keywords ? formData.keywords.split(',').map((k) => k.trim()) : [],
         ingredients: formData.ingredients ? formData.ingredients.split(',').map((i) => i.trim()) : [],
         brand: formData.brand || undefined,

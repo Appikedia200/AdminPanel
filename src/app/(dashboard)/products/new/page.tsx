@@ -119,6 +119,13 @@ export default function NewProductPage() {
     setLoading(true)
 
     try {
+      // ✅ CRITICAL FIX: Ensure images array only contains mediaId STRING, not objects with _previewUrl
+      const cleanImages = images.map(img => ({
+        mediaId: typeof img.mediaId === 'string' ? img.mediaId : String(img.mediaId),
+        isPrimary: img.isPrimary,
+        order: img.order
+      }))
+
       const payload: Record<string, unknown> = {
         name: formData.name,
         slug: formData.slug,
@@ -130,7 +137,7 @@ export default function NewProductPage() {
         stock: parseInt(formData.stock) || 0,
         trackInventory: formData.trackInventory,
         category: formData.category,
-        images: images, // Already in correct format: { mediaId, isPrimary, order }
+        images: cleanImages, // ✅ Use cleaned images array (mediaId as STRING only)
         keywords: formData.keywords ? formData.keywords.split(',').map((k) => k.trim()) : [],
         ingredients: formData.ingredients ? formData.ingredients.split(',').map((i) => i.trim()) : [],
         brand: formData.brand || undefined,

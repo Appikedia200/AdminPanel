@@ -33,16 +33,25 @@ function SortableProductItem({ product, onRemove }: { product: Product; onRemove
     opacity: isDragging ? 0.5 : 1,
   }
 
+  // ✅ Professional null-safe image URL extraction
   const productImage = product.images?.[0]
-  const imageUrl = typeof productImage === 'object' && 'mediaId' in productImage
-    ? (productImage.mediaId as any)?.cloudinaryUrl
-    : '/placeholder-image.png'
+  const imageUrl = (() => {
+    if (!productImage || typeof productImage !== 'object' || !('mediaId' in productImage)) {
+      return '/placeholder-image.png'
+    }
+    const mediaId = productImage.mediaId as any
+    // Handle both null and valid mediaId objects
+    if (!mediaId || typeof mediaId !== 'object' || !('cloudinaryUrl' in mediaId)) {
+      return '/placeholder-image.png'
+    }
+    return (mediaId.cloudinaryUrl as string) || '/placeholder-image.png'
+  })()
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center gap-3 p-3 bg-card border rounded-lg"
+      className="grid grid-cols-[auto_auto_1fr_auto] items-center gap-3 p-3 bg-card border rounded-lg"
     >
       <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing flex-shrink-0">
         <GripVertical className="h-5 w-5 text-muted-foreground" />
@@ -55,7 +64,7 @@ function SortableProductItem({ product, onRemove }: { product: Product; onRemove
         className="h-12 w-12 rounded object-cover flex-shrink-0"
       />
       
-      <div className="flex-1 min-w-0 overflow-hidden">
+      <div className="min-w-0 overflow-hidden">
         <p className="font-medium truncate">{product.name}</p>
         <div className="flex items-center gap-2 text-sm flex-wrap">
           <span className="text-muted-foreground whitespace-nowrap">{formatCurrency(product.price)}</span>
@@ -246,10 +255,19 @@ function ProductSelectionModal({
             ) : (
               <div className="space-y-2">
                 {availableProducts.map((product) => {
+                  // ✅ Professional null-safe image URL extraction
                   const productImage = product.images?.[0]
-                  const imageUrl = typeof productImage === 'object' && 'mediaId' in productImage
-                    ? (productImage.mediaId as any)?.cloudinaryUrl
-                    : '/placeholder-image.png'
+                  const imageUrl = (() => {
+                    if (!productImage || typeof productImage !== 'object' || !('mediaId' in productImage)) {
+                      return '/placeholder-image.png'
+                    }
+                    const mediaId = productImage.mediaId as any
+                    // Handle both null and valid mediaId objects
+                    if (!mediaId || typeof mediaId !== 'object' || !('cloudinaryUrl' in mediaId)) {
+                      return '/placeholder-image.png'
+                    }
+                    return (mediaId.cloudinaryUrl as string) || '/placeholder-image.png'
+                  })()
                   const isSelected = selectedIds.includes(product._id)
 
                   return (
@@ -262,7 +280,7 @@ function ProductSelectionModal({
                             : [...prev, product._id]
                         )
                       }}
-                      className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
+                      className={`grid grid-cols-[auto_1fr_auto] items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
                         isSelected ? 'bg-primary/10 border-primary' : 'hover:bg-accent'
                       }`}
                     >
@@ -272,7 +290,7 @@ function ProductSelectionModal({
                         alt={product.name}
                         className="h-12 w-12 rounded object-cover flex-shrink-0"
                       />
-                      <div className="flex-1 min-w-0 overflow-hidden">
+                      <div className="min-w-0 overflow-hidden">
                         <p className="font-medium truncate">{product.name}</p>
                         <p className="text-sm text-muted-foreground truncate">{formatCurrency(product.price)}</p>
                       </div>
