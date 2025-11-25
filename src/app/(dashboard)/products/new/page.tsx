@@ -434,7 +434,7 @@ export default function NewProductPage() {
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                Create categories like "Skincare", "Glasses", "Bangles", "Wristwatch", "Gold Chain" etc.
+                Create categories like &quot;Skincare&quot;, &quot;Glasses&quot;, &quot;Bangles&quot;, &quot;Wristwatch&quot;, &quot;Gold Chain&quot; etc.
               </p>
               {categories.length === 0 && !categoriesLoading && (
                 <p className="text-sm text-destructive">
