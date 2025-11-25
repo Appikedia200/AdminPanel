@@ -130,14 +130,24 @@ export default function LowStockProductsPage() {
                     <TableRow key={product._id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          {product.images[0] && (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={(product.images[0] as any).cloudinaryUrl || '/placeholder-image.png'}
-                              alt={product.name}
-                              className="h-10 w-10 rounded object-cover"
-                            />
-                          )}
+                          {(() => {
+                            const image = product.images?.[0]
+                            const imageUrl = image && typeof image.mediaId === 'object' && image.mediaId !== null
+                              ? (image.mediaId as any).cloudinaryUrl
+                              : null
+                            return imageUrl ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={imageUrl}
+                                alt={product.name}
+                                className="h-10 w-10 rounded object-cover"
+                              />
+                            ) : (
+                              <div className="h-10 w-10 rounded bg-muted flex items-center justify-center">
+                                <Package className="h-5 w-5 text-muted-foreground" />
+                              </div>
+                            )
+                          })()}
                           <div>
                             <p className="font-medium">{product.name}</p>
                             <p className="text-sm text-muted-foreground">{product.sku}</p>
@@ -187,14 +197,24 @@ export default function LowStockProductsPage() {
             {products.map((product) => (
               <Card key={product._id} className="p-4 border-l-4 border-l-amber-500">
                 <div className="flex gap-4">
-                  {product.images[0] && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={(product.images[0] as any).cloudinaryUrl || '/placeholder-image.png'}
-                      alt={product.name}
-                      className="h-20 w-20 rounded object-cover"
-                    />
-                  )}
+                  {(() => {
+                    const image = product.images?.[0]
+                    const imageUrl = image && typeof image.mediaId === 'object' && image.mediaId !== null
+                      ? (image.mediaId as any).cloudinaryUrl
+                      : null
+                    return imageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={imageUrl}
+                        alt={product.name}
+                        className="h-20 w-20 rounded object-cover"
+                      />
+                    ) : (
+                      <div className="h-20 w-20 rounded bg-muted flex items-center justify-center">
+                        <Package className="h-10 w-10 text-muted-foreground" />
+                      </div>
+                    )
+                  })()}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div>

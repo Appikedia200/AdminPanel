@@ -320,14 +320,24 @@ export default function DashboardPage() {
                     <Link key={item.product._id} href={ROUTES.PRODUCTS_EDIT(item.product._id)}>
                       <div className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 transition-colors cursor-pointer">
                         <div className="flex items-center gap-3">
-                          {item.product.images?.[0]?.url && (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={item.product.images[0].url}
-                              alt={item.product.name}
-                              className="h-10 w-10 rounded object-cover"
-                            />
-                          )}
+                          {(() => {
+                            const image = item.product.images?.[0]
+                            const imageUrl = image && typeof image.mediaId === 'object' && image.mediaId !== null
+                              ? (image.mediaId as any).cloudinaryUrl
+                              : null
+                            return imageUrl ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={imageUrl}
+                                alt={item.product.name}
+                                className="h-10 w-10 rounded object-cover"
+                              />
+                            ) : (
+                              <div className="h-10 w-10 rounded bg-muted flex items-center justify-center">
+                                <Package className="h-5 w-5 text-muted-foreground" />
+                              </div>
+                            )
+                          })()}
                           <div className="space-y-1">
                             <p className="font-medium text-sm">{item.product.name}</p>
                             <p className="text-xs text-muted-foreground">{item.totalSold} sold</p>

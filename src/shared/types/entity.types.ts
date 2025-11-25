@@ -132,9 +132,10 @@ export interface JewelryDetails {
 }
 
 export interface ProductImageReference {
-  mediaId: string
+  mediaId: string | Media // Can be populated by backend
   isPrimary: boolean
   order: number
+  _id?: string
 }
 
 export interface Product extends BaseEntity {

@@ -33,7 +33,14 @@ interface TopProduct {
   product: {
     _id: string
     name: string
-    images: Array<{ url: string }>
+    images: Array<{
+      mediaId: {
+        cloudinaryUrl: string
+        altText?: string
+      } | null
+      isPrimary: boolean
+      order: number
+    }>
   }
   totalSold: number
   revenue: number
