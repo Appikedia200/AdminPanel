@@ -122,4 +122,13 @@ export const API_ENDPOINTS = {
     markAllAsRead: '/api/notifications/read-all',
     delete: (id: string) => `/api/notifications/${id}`,
   },
+
+  // Analytics
+  analytics: {
+    summary: '/api/analytics/summary',
+    revenue: '/api/analytics/revenue',
+    topProducts: '/api/analytics/top-products',
+    salesByCategory: '/api/analytics/sales-by-category',
+    export: '/api/analytics/export',
+  },
 } as const

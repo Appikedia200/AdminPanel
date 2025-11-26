@@ -30,6 +30,7 @@ export const ROUTES = {
   PRODUCTS_LOW_STOCK: '/products/low-stock',
   CATEGORIES: '/categories',
   HOMEPAGE_SECTIONS: '/homepage-sections',
+  ANALYTICS: '/analytics',
   REVIEWS: '/reviews',
   ORDERS: '/orders',
   ORDERS_DETAIL: (id: string) => `/orders/${id}`,

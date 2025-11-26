@@ -2,13 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Package, FolderTree, Star, ShoppingCart, Image, Settings, Mail, Sparkles, Layout } from 'lucide-react'
+import { LayoutDashboard, Package, FolderTree, Star, ShoppingCart, Image, Settings, Mail, Sparkles, Layout, BarChart3 } from 'lucide-react'
 import { cn } from '@/shared/utils/cn'
 import { Separator } from '@/presentation/components/ui/separator'
 import { usePendingReviewsCount } from '@/presentation/hooks/use-pending-reviews-count'
 
 const menuItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/products', label: 'Products', icon: Package },
   { href: '/categories', label: 'Categories', icon: FolderTree },
   { href: '/homepage-sections', label: 'Homepage', icon: Layout },

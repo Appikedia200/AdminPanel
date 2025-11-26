@@ -10,6 +10,7 @@ interface DashboardStats {
   pendingOrders: number
   totalProducts: number
   lowStockProducts: number
+  inventoryValue: number
   totalCustomers: number
   totalReviews: number
   pendingReviews: number

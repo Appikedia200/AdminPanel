@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Package, ShoppingCart, Star, TrendingUp, ArrowRight, Clock } from 'lucide-react'
+import { Package, ShoppingCart, Star, TrendingUp, ArrowRight, Clock, DollarSign } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/presentation/components/ui/card'
 import { Skeleton } from '@/presentation/components/ui/skeleton'
 import { Badge } from '@/presentation/components/ui/badge'
@@ -41,8 +41,8 @@ export default function DashboardPage() {
           <Skeleton className="h-4 w-96" />
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {[1, 2, 3, 4].map((i) => (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+          {[1, 2, 3, 4, 5].map((i) => (
             <Card key={i}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <Skeleton className="h-4 w-24" />
@@ -158,6 +158,21 @@ export default function DashboardPage() {
                 </Button>
               </Link>
             )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Inventory Value</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {stats ? formatCurrency(stats.inventoryValue || 0) : '₦0.00'}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Total stock worth
+            </p>
           </CardContent>
         </Card>
 
