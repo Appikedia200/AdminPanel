@@ -12,11 +12,13 @@ interface ApiError {
 export function handleApiError(error: AxiosError<ApiError>): never {
   // Network error (no response from server)
   if (!error.response) {
-    const networkError = {
+    const networkError = new Error('Network error. Please check your internet connection.')
+    Object.assign(networkError, {
       error: 'Network error. Please check your internet connection.',
       errorCode: 'NETWORK_ERROR',
-      status: 0
-    }
+      status: 0,
+      response: null
+    })
     throw networkError
   }
 
@@ -40,12 +42,15 @@ export function handleApiError(error: AxiosError<ApiError>): never {
   const errorMessage = data?.error || data?.message || 'An error occurred'
   const errorCode = data?.errorCode || `HTTP_${status}`
 
-  // Throw structured error for the calling code to handle
-  throw {
+  // ✅ Create proper Error object (fixes React error #31)
+  const apiError = new Error(errorMessage)
+  Object.assign(apiError, {
     error: errorMessage,
     errorCode: errorCode,
     status: status,
-    originalError: error
-  }
+    response: error.response
+  })
+  
+  throw apiError
 }
 

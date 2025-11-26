@@ -86,11 +86,17 @@ export default function ProfilePage() {
         error?.message || 
         'Failed to change password'
       
-      toast.error(errorMessage)
-      console.error('Change password error:', {
-        status: error?.response?.status,
+      toast.error(errorMessage, {
+        description: error?.status ? `Error code: ${error.status}` : undefined,
+        duration: 5000
+      })
+      
+      console.error('❌ Change password error:', {
+        status: error?.status || error?.response?.status,
+        errorCode: error?.errorCode,
         data: error?.response?.data,
-        message: errorMessage
+        message: errorMessage,
+        fullError: error
       })
     } finally {
       setPasswordLoading(false)
