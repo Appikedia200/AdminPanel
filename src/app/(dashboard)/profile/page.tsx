@@ -60,12 +60,17 @@ export default function ProfilePage() {
 
     setPasswordLoading(true)
     try {
-      await httpClient.put(API_ENDPOINTS.auth.changePassword, {
+      // ✅ Backend endpoint: PUT /api/auth/change-password
+      // Payload: { currentPassword, newPassword }
+      const response: any = await httpClient.put(API_ENDPOINTS.auth.changePassword, {
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword,
       })
       
-      toast.success('Password changed successfully')
+      // Display backend success message if available
+      const successMessage = response?.data?.message || response?.message || 'Password changed successfully'
+      toast.success(successMessage)
+      
       setChangePasswordOpen(false)
       setPasswordData({
         currentPassword: '',
@@ -73,8 +78,20 @@ export default function ProfilePage() {
         confirmPassword: '',
       })
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.error || error?.error || error?.message || 'Failed to change password'
+      // ✅ Extract specific backend error message
+      const errorMessage = 
+        error?.response?.data?.error || 
+        error?.response?.data?.message ||
+        error?.error || 
+        error?.message || 
+        'Failed to change password'
+      
       toast.error(errorMessage)
+      console.error('Change password error:', {
+        status: error?.response?.status,
+        data: error?.response?.data,
+        message: errorMessage
+      })
     } finally {
       setPasswordLoading(false)
     }
