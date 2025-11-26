@@ -74,13 +74,22 @@
   * {
     @apply border-border;
   }
+  
   html {
     scroll-behavior: smooth;
+    /* ✅ Prevent layout shift from scrollbar */
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
   }
+  
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    /* ✅ Prevent horizontal scrolling */
     overflow-x: hidden;
+    /* ✅ Ensure body takes full height */
+    min-height: 100vh;
   }
+  
   h1 {
     @apply text-3xl font-bold tracking-tight lg:text-4xl;
   }
@@ -103,17 +112,14 @@
     @apply min-h-[44px] min-w-[44px];
   }
   
-  /* Smooth scrolling and prevent layout shifts */
+  /* ✅ Smooth scrolling */
   .scroll-smooth {
     scroll-behavior: smooth;
   }
   
-  /* Prevent content jumping during navigation */
-  @supports (scrollbar-gutter: stable) {
-    html {
-      overflow-y: auto;
-      scrollbar-gutter: stable;
-    }
+  /* ✅ Prevent content jumping - stable scrollbar space */
+  .no-jump {
+    scrollbar-gutter: stable;
   }
 }
 
