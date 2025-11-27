@@ -280,7 +280,6 @@ export type HomepageSectionType =
   | 'featured' 
   | 'new_arrivals' 
   | 'back_in_stock' 
-  | 'trending' 
   | 'best_sellers'
 
 export interface HomepageSection extends BaseEntity {

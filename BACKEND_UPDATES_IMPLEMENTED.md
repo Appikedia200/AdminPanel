@@ -395,7 +395,6 @@ DELETE /api/homepage-sections/:type        # Delete section
    - Featured Items
    - New Arrivals
    - Back in Stock
-   - Trending Now
    - Best Sellers
 4. Add drag-and-drop for product ordering
 5. Add product search/filter for selection

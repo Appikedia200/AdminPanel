@@ -23,7 +23,7 @@ A complete **Homepage Sections Management** system allowing admins to curate pro
 **Page:** `/homepage-sections`
 
 **Capabilities:**
-- View all 5 homepage sections in one place
+- View all 4 homepage sections in one place
 - Sections automatically sorted by display order
 - Real-time product count display (`8/8 Products`)
 - Active/Inactive status badges
@@ -33,8 +33,7 @@ A complete **Homepage Sections Management** system allowing admins to curate pro
 1. ✅ **Featured Items** - Hand-picked products
 2. ✅ **New Arrivals** - Latest products
 3. ✅ **Back in Stock** - Recently restocked
-4. ✅ **Trending Now** - Popular products
-5. ✅ **Best Sellers** - Top selling products
+4. ✅ **Best Sellers** - Top selling products
 
 ---
 

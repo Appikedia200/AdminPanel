@@ -416,7 +416,9 @@ import { ProductCard } from '@/components/product/ProductCard'
 
 export default function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState([])
-  const [trendingProducts, setTrendingProducts] = useState([])
+  const [newArrivals, setNewArrivals] = useState([])
+  const [backInStock, setBackInStock] = useState([])
+  const [bestSellers, setBestSellers] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -424,10 +426,14 @@ export default function HomePage() {
       try {
         // Fetch homepage sections from backend
         const featured = await apiClient.get('/api/homepage-sections/featured')
-        const trending = await apiClient.get('/api/homepage-sections/trending')
+        const arrivals = await apiClient.get('/api/homepage-sections/new_arrivals')
+        const backStock = await apiClient.get('/api/homepage-sections/back_in_stock')
+        const bestsellers = await apiClient.get('/api/homepage-sections/best_sellers')
         
         setFeaturedProducts(featured.data.products || [])
-        setTrendingProducts(trending.data.products || [])
+        setNewArrivals(arrivals.data.products || [])
+        setBackInStock(backStock.data.products || [])
+        setBestSellers(bestsellers.data.products || [])
       } catch (error) {
         console.error('Failed to fetch homepage data:', error)
       } finally {
@@ -448,7 +454,7 @@ export default function HomePage() {
 
       {/* Featured Products */}
       <section className="featured-products">
-        <h2>Featured Products</h2>
+        <h2>Featured Items</h2>
         <div className="grid grid-cols-4 gap-6">
           {featuredProducts.map((product) => (
             <ProductCard key={product._id} product={product} />
@@ -456,11 +462,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Trending Products */}
-      <section className="trending-products">
-        <h2>Trending Now</h2>
+      {/* New Arrivals */}
+      <section className="new-arrivals">
+        <h2>New Arrivals</h2>
         <div className="grid grid-cols-4 gap-6">
-          {trendingProducts.map((product) => (
+          {newArrivals.map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))}
+        </div>
+      </section>
+
+      {/* Back in Stock */}
+      <section className="back-in-stock">
+        <h2>Back in Stock</h2>
+        <div className="grid grid-cols-4 gap-6">
+          {backInStock.map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))}
+        </div>
+      </section>
+
+      {/* Best Sellers */}
+      <section className="best-sellers">
+        <h2>Best Sellers</h2>
+        <div className="grid grid-cols-4 gap-6">
+          {bestSellers.map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}
         </div>
@@ -619,4 +645,5 @@ All three connect to the **same backend**, using the **same database**, creating
 ---
 
 **Ready to deploy the admin panel to Vercel and get that URL?** 🚀
+
 
