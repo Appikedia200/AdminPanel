@@ -116,7 +116,7 @@ export default function EditProductPage() {
                 order: (img.order as number) ?? index,
                 _previewUrl: previewUrl || '/placeholder-image.png',
               }
-            }).filter(img => img.mediaId && !img.mediaId.startsWith('temp-'))
+            }).filter((img: any) => img.mediaId && !img.mediaId.startsWith('temp-'))
             
             setImages(productImages)
           } catch {
