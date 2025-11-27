@@ -285,13 +285,15 @@ function ProductSelectionModal({
                         isSelected ? 'bg-primary/10 border-primary' : 'hover:bg-accent'
                       }`}
                     >
-                      {/* Image */}
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={imageUrl}
-                        alt={product.name}
-                        className="w-16 h-16 rounded object-cover flex-shrink-0"
-                      />
+                      {/* Image Container - Fixed width, prevents alt text overflow */}
+                      <div className="w-16 h-16 flex-shrink-0 overflow-hidden rounded bg-gray-100">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={imageUrl}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                       
                       {/* Product Info */}
                       <div className="flex-1 min-w-0">
