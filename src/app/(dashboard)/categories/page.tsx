@@ -108,8 +108,25 @@ export default function CategoriesPage() {
       handleCloseDialog()
       refetch()
     } catch (error: any) {
-      const errorMessage = error?.error || error?.message || error?.response?.data?.error || error?.response?.data?.message || 'Operation failed'
-      toast.error(errorMessage)
+      // ✅ PROFESSIONAL: Extract backend error message with all possible paths
+      let errorMessage = 'Operation failed'
+      
+      if (error?.response?.data?.error) {
+        errorMessage = error.response.data.error
+      } else if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (error?.error) {
+        errorMessage = error.error
+      } else if (error?.message) {
+        errorMessage = error.message
+      }
+      
+      // Log for debugging
+      console.error('Category operation error:', error)
+      
+      toast.error(errorMessage, {
+        duration: 5000, // Show for 5 seconds so user can read
+      })
     } finally {
       setSubmitting(false)
     }
@@ -123,8 +140,25 @@ export default function CategoriesPage() {
       toast.success('Category deleted successfully')
       refetch()
     } catch (error: any) {
-      const errorMessage = error?.error || error?.message || error?.response?.data?.error || error?.response?.data?.message || 'Failed to delete category'
-      toast.error(errorMessage)
+      // ✅ PROFESSIONAL: Extract specific backend error message
+      let errorMessage = 'Failed to delete category'
+      
+      if (error?.response?.data?.error) {
+        errorMessage = error.response.data.error
+      } else if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (error?.error) {
+        errorMessage = error.error
+      } else if (error?.message) {
+        errorMessage = error.message
+      }
+      
+      // Log for debugging
+      console.error('Category delete error:', error)
+      
+      toast.error(errorMessage, {
+        duration: 5000, // Show for 5 seconds so user can read
+      })
     }
   }
 
