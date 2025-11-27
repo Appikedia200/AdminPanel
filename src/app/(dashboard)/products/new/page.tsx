@@ -161,20 +161,20 @@ export default function NewProductPage() {
 
   return (
     <TooltipProvider>
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Link href={ROUTES.PRODUCTS}>
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold">Add New Product</h1>
-            <p className="text-muted-foreground mt-1">Create a new product listing</p>
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <Link href={ROUTES.PRODUCTS}>
+          <Button variant="ghost" size="icon">
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+        </Link>
+        <div>
+          <h1 className="text-3xl font-bold">Add New Product</h1>
+          <p className="text-muted-foreground mt-1">Create a new product listing</p>
         </div>
+      </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information */}
         <Card>
           <CardHeader>
@@ -184,7 +184,7 @@ export default function NewProductPage() {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="name">Product Name *</Label>
+                <Label htmlFor="name">Product Name *</Label>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
@@ -205,7 +205,7 @@ export default function NewProductPage() {
 
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="slug">URL Slug *</Label>
+                <Label htmlFor="slug">URL Slug *</Label>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
@@ -231,7 +231,7 @@ export default function NewProductPage() {
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Label htmlFor="description">Description *</Label>
+              <Label htmlFor="description">Description *</Label>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
@@ -257,7 +257,7 @@ export default function NewProductPage() {
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Label htmlFor="shortDescription">Short Description</Label>
+              <Label htmlFor="shortDescription">Short Description</Label>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
@@ -281,7 +281,7 @@ export default function NewProductPage() {
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Label htmlFor="keywords">Keywords (comma-separated)</Label>
+              <Label htmlFor="keywords">Keywords (comma-separated)</Label>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
@@ -301,7 +301,7 @@ export default function NewProductPage() {
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Label htmlFor="ingredients">Ingredients (comma-separated)</Label>
+              <Label htmlFor="ingredients">Ingredients (comma-separated)</Label>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
@@ -321,7 +321,7 @@ export default function NewProductPage() {
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Label htmlFor="brand">Brand</Label>
+              <Label htmlFor="brand">Brand</Label>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
@@ -427,7 +427,7 @@ export default function NewProductPage() {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="price">Price (₦) *</Label>
+                <Label htmlFor="price">Price (₦) *</Label>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
@@ -451,7 +451,7 @@ export default function NewProductPage() {
 
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="comparePrice">Compare at Price (₦)</Label>
+                <Label htmlFor="comparePrice">Compare at Price (₦)</Label>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
@@ -489,7 +489,7 @@ export default function NewProductPage() {
             <div className="grid gap-4 md:grid-cols-3">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="sku">SKU *</Label>
+                <Label htmlFor="sku">SKU *</Label>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
@@ -519,7 +519,7 @@ export default function NewProductPage() {
 
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="stock">Stock Quantity *</Label>
+                <Label htmlFor="stock">Stock Quantity *</Label>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
@@ -654,8 +654,8 @@ export default function NewProductPage() {
             )}
           </Button>
         </div>
-        </form>
-      </div>
+      </form>
+    </div>
     </TooltipProvider>
   )
 }

@@ -136,12 +136,12 @@ export default function LowStockProductsPage() {
                               ? (image.mediaId as any).cloudinaryUrl
                               : null
                             return imageUrl ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
                                 src={imageUrl}
-                                alt={product.name}
-                                className="h-10 w-10 rounded object-cover"
-                              />
+                              alt={product.name}
+                              className="h-10 w-10 rounded object-cover"
+                            />
                             ) : (
                               <div className="h-10 w-10 rounded bg-muted flex items-center justify-center">
                                 <Package className="h-5 w-5 text-muted-foreground" />
@@ -203,12 +203,12 @@ export default function LowStockProductsPage() {
                       ? (image.mediaId as any).cloudinaryUrl
                       : null
                     return imageUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
                         src={imageUrl}
-                        alt={product.name}
-                        className="h-20 w-20 rounded object-cover"
-                      />
+                      alt={product.name}
+                      className="h-20 w-20 rounded object-cover"
+                    />
                     ) : (
                       <div className="h-20 w-20 rounded bg-muted flex items-center justify-center">
                         <Package className="h-10 w-10 text-muted-foreground" />

@@ -41,7 +41,7 @@ export default function DashboardLayout({
         {/* ✅ Smart layout: prevents jumping with proper min-height */}
         <main className="flex-1 w-full p-4 lg:p-6 relative">
           <div className="max-w-[1600px] mx-auto">
-            {children}
+          {children}
           </div>
         </main>
       </div>
