@@ -40,7 +40,7 @@ export default function CategoriesPage() {
     slug: '',
     description: '',
     displayOrder: 1,
-    active: true, // ✅ Required by backend
+    isActive: true, // ✅ Backend expects 'isActive', not 'active'
   })
   const [submitting, setSubmitting] = useState(false)
 
@@ -56,7 +56,7 @@ export default function CategoriesPage() {
         slug: category.slug,
         description: category.description || '',
         displayOrder: category.displayOrder,
-        active: category.active, // ✅ Include active field
+        isActive: category.active, // ✅ Map 'active' from category to 'isActive' for form
       })
     } else {
       setEditingCategory(null)
@@ -65,7 +65,7 @@ export default function CategoriesPage() {
         slug: '',
         description: '',
         displayOrder: categories.length + 1,
-        active: true, // ✅ Default to active for new categories
+        isActive: true, // ✅ Default to active for new categories
       })
     }
     setDialogOpen(true)
@@ -79,7 +79,7 @@ export default function CategoriesPage() {
       slug: '',
       description: '',
       displayOrder: 1,
-      active: true, // ✅ Reset to active
+      isActive: true, // ✅ Reset to active
     })
   }
 
@@ -88,12 +88,12 @@ export default function CategoriesPage() {
     setSubmitting(true)
 
     try {
-      // ✅ CRITICAL: Include ALL required fields including 'active'
+      // ✅ CRITICAL: Include ALL required fields with correct field names
       const dataToSend = {
         name: formData.name,
         description: formData.description || undefined,
         displayOrder: formData.displayOrder,
-        active: formData.active, // ✅ REQUIRED by backend!
+        isActive: formData.isActive, // ✅ Backend expects 'isActive', not 'active'
         ...(formData.slug?.trim() ? { slug: formData.slug.trim() } : {}), // Only include slug if provided
       }
 
