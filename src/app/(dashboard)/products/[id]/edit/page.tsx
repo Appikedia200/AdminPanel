@@ -52,7 +52,9 @@ export default function EditProductPage() {
   })
 
   // Safely determine if selected category is jewelry
-  const selectedCategory = categories?.find(cat => cat?._id === formData?.category)
+  // Ensure categories is an array before calling .find()
+  const categoriesArray = Array.isArray(categories) ? categories : []
+  const selectedCategory = categoriesArray.find(cat => cat?._id === formData?.category)
   const isJewelryCategory = selectedCategory?.name?.toLowerCase().includes('jewelry') || 
                              selectedCategory?.name?.toLowerCase().includes('jewellery') || false
   

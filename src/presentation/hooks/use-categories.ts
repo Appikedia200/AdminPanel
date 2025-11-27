@@ -14,11 +14,15 @@ export function useCategories() {
       setLoading(true)
       setError(null)
       const response = await repository.findAll()
-      setCategories(response.data)
+      // Ensure we always set an array, even if backend returns unexpected data
+      const categoriesData = Array.isArray(response.data) ? response.data : []
+      setCategories(categoriesData)
     } catch (err: any) {
       const errorMessage = err.error || 'Failed to load categories'
       setError(errorMessage)
       toast.error(errorMessage)
+      // Ensure categories is empty array on error
+      setCategories([])
     } finally {
       setLoading(false)
     }
