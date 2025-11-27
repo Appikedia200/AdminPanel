@@ -19,30 +19,39 @@ export class CategoryRepositoryImpl implements ICategoryRepository {
       // If response is directly an array, wrap it in paginated format
       if (Array.isArray(response)) {
         return {
+          success: true,
           data: response,
-          total: response.length,
-          page: 1,
-          limit: response.length,
-          totalPages: 1
+          pagination: {
+            page: 1,
+            limit: response.length,
+            total: response.length,
+            totalPages: 1
+          }
         } as PaginatedResponse<Category>
       }
       
       // Fallback: return empty paginated response
       return {
+        success: true,
         data: [],
-        total: 0,
-        page: 1,
-        limit: 10,
-        totalPages: 0
+        pagination: {
+          page: 1,
+          limit: 10,
+          total: 0,
+          totalPages: 0
+        }
       } as PaginatedResponse<Category>
     } catch {
       // Return empty paginated response on error
       return {
+        success: true,
         data: [],
-        total: 0,
-        page: 1,
-        limit: 10,
-        totalPages: 0
+        pagination: {
+          page: 1,
+          limit: 10,
+          total: 0,
+          totalPages: 0
+        }
       } as PaginatedResponse<Category>
     }
   }
