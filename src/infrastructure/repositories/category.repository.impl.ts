@@ -35,7 +35,7 @@ export class CategoryRepositoryImpl implements ICategoryRepository {
         limit: 10,
         totalPages: 0
       } as PaginatedResponse<Category>
-    } catch (error) {
+    } catch {
       // Return empty paginated response on error
       return {
         data: [],
