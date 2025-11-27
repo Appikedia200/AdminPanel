@@ -88,12 +88,13 @@ export default function CategoriesPage() {
     setSubmitting(true)
 
     try {
-      // ✅ Prepare data - remove empty slug (let backend auto-generate)
+      // ✅ CRITICAL: Include ALL required fields including 'active'
       const dataToSend = {
         name: formData.name,
         description: formData.description || undefined,
         displayOrder: formData.displayOrder,
-        ...(formData.slug ? { slug: formData.slug } : {}), // Only include slug if provided
+        active: formData.active, // ✅ REQUIRED by backend!
+        ...(formData.slug?.trim() ? { slug: formData.slug.trim() } : {}), // Only include slug if provided
       }
 
       if (editingCategory) {

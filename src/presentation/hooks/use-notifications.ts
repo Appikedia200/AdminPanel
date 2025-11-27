@@ -32,8 +32,7 @@ export function useNotifications() {
         setNotifications(response.data)
       }
     } catch {
-      // Silently fail if endpoint doesn't exist yet
-      console.log('Notifications not available yet')
+      // Silently fail if endpoint doesn't exist yet - no console spam
       setNotifications([])
     } finally {
       setIsLoading(false)

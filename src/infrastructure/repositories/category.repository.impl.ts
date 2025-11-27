@@ -11,36 +11,33 @@ export class CategoryRepositoryImpl implements ICategoryRepository {
       const url = `${API_ENDPOINTS.categories.list}${queryString ? `?${queryString}` : ''}`
       const response: any = await httpClient.get(url)
       
-      // Handle both paginated and simple array responses
-      if (response.data && Array.isArray(response.data)) {
-        return response as PaginatedResponse<Category>
+      // ✅ CRITICAL FIX: Backend returns { success: true, data: { categories: [...] } }
+      let categoriesArray: Category[] = []
+      
+      if (response.success && response.data) {
+        // Check if data contains nested 'categories' array (NEW BACKEND FORMAT)
+        if (response.data.categories && Array.isArray(response.data.categories)) {
+          categoriesArray = response.data.categories
+        } 
+        // Or if data is directly an array (OLD FORMAT)
+        else if (Array.isArray(response.data)) {
+          categoriesArray = response.data
+        }
+      }
+      // Fallback: check if response itself is an array
+      else if (Array.isArray(response)) {
+        categoriesArray = response
       }
       
-      // If response is directly an array, wrap it in paginated format
-      if (Array.isArray(response)) {
-        return {
-          success: true,
-          data: response,
-          pagination: {
-            page: 1,
-            limit: response.length,
-            total: response.length,
-            totalPages: 1,
-            hasNextPage: false,
-            hasPrevPage: false
-          }
-        } as PaginatedResponse<Category>
-      }
-      
-      // Fallback: return empty paginated response
+      // Return in PaginatedResponse format
       return {
         success: true,
-        data: [],
+        data: categoriesArray,
         pagination: {
           page: 1,
-          limit: 10,
-          total: 0,
-          totalPages: 0,
+          limit: categoriesArray.length || 10,
+          total: categoriesArray.length,
+          totalPages: categoriesArray.length > 0 ? 1 : 0,
           hasNextPage: false,
           hasPrevPage: false
         }
