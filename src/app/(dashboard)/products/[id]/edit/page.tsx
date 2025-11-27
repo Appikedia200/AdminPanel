@@ -24,12 +24,13 @@ import type { JewelryDetails } from '@/shared/types/entity.types'
 export default function EditProductPage() {
   const router = useRouter()
   const params = useParams()
-  const productId = params.id as string
+  const productId = params?.id as string
   const { categories, loading: categoriesLoading } = useCategories()
   const { uploadMultipleImages, uploading } = useImageUpload()
   
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [images, setImages] = useState<UploadedImage[]>([])
   const [jewelry, setJewelry] = useState<Partial<JewelryDetails>>({})
   const [formData, setFormData] = useState({
@@ -50,28 +51,53 @@ export default function EditProductPage() {
     status: 'draft' as 'draft' | 'active' | 'inactive',
   })
 
-  // Determine if selected category is jewelry
-  const selectedCategory = categories.find(cat => cat._id === formData.category)
+  // Safely determine if selected category is jewelry
+  const selectedCategory = categories?.find(cat => cat?._id === formData?.category)
   const isJewelryCategory = selectedCategory?.name?.toLowerCase().includes('jewelry') || 
                              selectedCategory?.name?.toLowerCase().includes('jewellery') || false
+  
+  // Handle missing product ID
+  if (!productId) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Invalid Product ID</h2>
+          <Button onClick={() => router.push(ROUTES.PRODUCTS)}>
+            Go Back to Products
+          </Button>
+        </div>
+      </div>
+    )
+  }
 
   // Fetch product data
   useEffect(() => {
     const fetchProduct = async () => {
+      if (!productId) {
+        setFetching(false)
+        return
+      }
+
       setFetching(true)
       try {
+        console.log('[Product Edit] Fetching product:', productId)
         const response: any = await httpClient.get(API_ENDPOINTS.products.get(productId))
+        console.log('[Product Edit] Response:', response)
         
-        if (!response.success || !response.data) {
+        if (!response || !response.success || !response.data) {
+          console.error('[Product Edit] Invalid response:', response)
           throw new Error('Failed to load product data')
         }
         
         const product = response.data
+        console.log('[Product Edit] Product data:', product)
         
         // Safely extract category ID
         const categoryId = typeof product.category === 'string' 
           ? product.category 
-          : product.category?._id || ''
+          : (product.category && typeof product.category === 'object' ? product.category._id : '')
+        
+        console.log('[Product Edit] Category ID:', categoryId)
         
         setFormData({
           name: product.name || '',
@@ -92,46 +118,61 @@ export default function EditProductPage() {
         })
         
         // Set images - backend returns populated media references
+        console.log('[Product Edit] Processing images:', product.images)
         if (Array.isArray(product.images) && product.images.length > 0) {
-          const productImages = product.images.map((img: any, index: number) => {
-            // mediaId can be a string (ID) or populated object (Media)
-            const mediaId = typeof img.mediaId === 'string' 
-              ? img.mediaId 
-              : img.mediaId?._id || img._id
+          try {
+            const productImages = product.images.map((img: any, index: number) => {
+              console.log(`[Product Edit] Image ${index}:`, img)
+              
+              // mediaId can be a string (ID) or populated object (Media)
+              let mediaId = ''
+              let previewUrl = ''
+              
+              if (typeof img.mediaId === 'string') {
+                mediaId = img.mediaId
+              } else if (img.mediaId && typeof img.mediaId === 'object') {
+                mediaId = img.mediaId._id || ''
+                previewUrl = img.mediaId.cloudinaryUrl || ''
+              } else if (img._id) {
+                mediaId = img._id
+              }
+              
+              console.log(`[Product Edit] Extracted - mediaId: ${mediaId}, previewUrl: ${previewUrl}`)
+              
+              return {
+                mediaId: mediaId || `temp-${index}`,
+                isPrimary: img.isPrimary ?? (index === 0),
+                order: img.order ?? index,
+                _previewUrl: previewUrl || '/placeholder-image.png',
+              }
+            }).filter(img => img.mediaId && !img.mediaId.startsWith('temp-'))
             
-            // cloudinaryUrl is on the populated mediaId object
-            const previewUrl = typeof img.mediaId === 'object' && img.mediaId !== null
-              ? img.mediaId.cloudinaryUrl
-              : undefined
-            
-            return {
-              mediaId: mediaId || `temp-${index}`,
-              isPrimary: img.isPrimary ?? (index === 0),
-              order: img.order ?? index,
-              _previewUrl: previewUrl || '/placeholder-image.png',
-            }
-          }).filter(img => img.mediaId && !img.mediaId.startsWith('temp-')) // Remove invalid images
-          
-          setImages(productImages)
+            console.log('[Product Edit] Processed images:', productImages)
+            setImages(productImages)
+          } catch (imgError) {
+            console.error('[Product Edit] Error processing images:', imgError)
+            setImages([])
+          }
         }
 
         // Set jewelry details if present
         if (product.jewelry && typeof product.jewelry === 'object') {
+          console.log('[Product Edit] Setting jewelry:', product.jewelry)
           setJewelry(product.jewelry)
         }
+        
+        console.log('[Product Edit] Fetch complete')
       } catch (error: any) {
-        console.error('Failed to fetch product:', error)
+        console.error('[Product Edit] Fetch error:', error)
         const errorMessage = error?.response?.data?.error || error?.error || error?.message || 'Failed to load product'
+        setError(errorMessage)
         toast.error(errorMessage)
-        router.push(ROUTES.PRODUCTS)
       } finally {
         setFetching(false)
       }
     }
 
-    if (productId) {
-      fetchProduct()
-    }
+    fetchProduct()
   }, [productId, router])
 
   const handleChange = (field: string, value: string) => {
@@ -251,6 +292,25 @@ export default function EditProductPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center max-w-md">
+          <h2 className="text-2xl font-bold mb-4 text-destructive">Error Loading Product</h2>
+          <p className="text-muted-foreground mb-6">{error}</p>
+          <div className="flex gap-4 justify-center">
+            <Button onClick={() => router.push(ROUTES.PRODUCTS)}>
+              Go Back to Products
+            </Button>
+            <Button variant="outline" onClick={() => window.location.reload()}>
+              Retry
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (fetching) {
