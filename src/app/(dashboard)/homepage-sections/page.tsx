@@ -280,23 +280,34 @@ function ProductSelectionModal({
                             : [...prev, product._id]
                         )
                       }}
-                      className={`grid grid-cols-[auto_1fr_auto] items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
+                      className={`flex items-start sm:items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
                         isSelected ? 'bg-primary/10 border-primary' : 'hover:bg-accent'
                       }`}
                     >
+                      {/* Image */}
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={imageUrl}
                         alt={product.name}
-                        className="h-12 w-12 rounded object-cover flex-shrink-0"
+                        className="h-12 w-12 sm:h-14 sm:w-14 rounded object-cover flex-shrink-0"
                       />
-                      <div className="min-w-0 overflow-hidden">
-                        <p className="font-medium truncate">{product.name}</p>
-                        <p className="text-sm text-muted-foreground truncate">{formatCurrency(product.price)}</p>
+                      
+                      {/* Product Info - Takes remaining space */}
+                      <div className="flex-1 min-w-0 overflow-hidden">
+                        <p className="font-medium text-sm sm:text-base mb-1 break-words line-clamp-2">
+                          {product.name}
+                        </p>
+                        <p className="text-sm text-muted-foreground font-semibold">
+                          {formatCurrency(product.price)}
+                        </p>
                       </div>
-                      <div className="flex-shrink-0">
+                      
+                      {/* Selection Badge */}
+                      <div className="flex-shrink-0 self-center">
                         {isSelected && (
-                          <Badge variant="default">Selected</Badge>
+                          <Badge variant="default" className="text-xs whitespace-nowrap">
+                            Selected
+                          </Badge>
                         )}
                       </div>
                     </div>
