@@ -38,8 +38,22 @@ export function handleApiError(error: AxiosError<ApiError>): never {
     }
   }
 
-  // Preserve backend error details
-  const errorMessage = data?.error || data?.message || 'An error occurred'
+  // ✅ PROFESSIONAL: Extract error message safely (handles all backend formats)
+  let errorMessage = 'An error occurred'
+  
+  // Try different backend response formats
+  if (typeof data?.error === 'string' && data.error) {
+    errorMessage = data.error
+  } else if (typeof data?.message === 'string' && data.message) {
+    errorMessage = data.message
+  } else if (data?.error && typeof data.error === 'object') {
+    // If error is an object, try to extract message from it
+    errorMessage = (data.error as any)?.message || JSON.stringify(data.error)
+  } else if (typeof data === 'string') {
+    // Sometimes backend sends plain string
+    errorMessage = data
+  }
+  
   const errorCode = data?.errorCode || `HTTP_${status}`
 
   // ✅ Create proper Error object (fixes React error #31)
