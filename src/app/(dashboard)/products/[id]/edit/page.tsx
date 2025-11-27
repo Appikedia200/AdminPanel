@@ -62,45 +62,67 @@ export default function EditProductPage() {
       try {
         const response: any = await httpClient.get(API_ENDPOINTS.products.get(productId))
         
-        if (response.success && response.data) {
-          const product = response.data
+        if (!response.success || !response.data) {
+          throw new Error('Failed to load product data')
+        }
+        
+        const product = response.data
+        
+        // Safely extract category ID
+        const categoryId = typeof product.category === 'string' 
+          ? product.category 
+          : product.category?._id || ''
+        
+        setFormData({
+          name: product.name || '',
+          slug: product.slug || '',
+          description: product.description || '',
+          shortDescription: product.shortDescription || '',
+          price: product.price?.toString() || '',
+          comparePrice: product.comparePrice?.toString() || '',
+          sku: product.sku || '',
+          stock: product.stock?.toString() || '',
+          category: categoryId,
+          keywords: Array.isArray(product.keywords) ? product.keywords.join(', ') : '',
+          ingredients: Array.isArray(product.ingredients) ? product.ingredients.join(', ') : '',
+          brand: product.brand || '',
+          trackInventory: product.trackInventory ?? true,
+          featured: product.featured ?? false,
+          status: product.status || 'draft',
+        })
+        
+        // Set images - backend returns populated media references
+        if (Array.isArray(product.images) && product.images.length > 0) {
+          const productImages = product.images.map((img: any, index: number) => {
+            // mediaId can be a string (ID) or populated object (Media)
+            const mediaId = typeof img.mediaId === 'string' 
+              ? img.mediaId 
+              : img.mediaId?._id || img._id
+            
+            // cloudinaryUrl is on the populated mediaId object
+            const previewUrl = typeof img.mediaId === 'object' && img.mediaId !== null
+              ? img.mediaId.cloudinaryUrl
+              : undefined
+            
+            return {
+              mediaId: mediaId || `temp-${index}`,
+              isPrimary: img.isPrimary ?? (index === 0),
+              order: img.order ?? index,
+              _previewUrl: previewUrl || '/placeholder-image.png',
+            }
+          }).filter(img => img.mediaId && !img.mediaId.startsWith('temp-')) // Remove invalid images
           
-          setFormData({
-            name: product.name || '',
-            slug: product.slug || '',
-            description: product.description || '',
-            shortDescription: product.shortDescription || '',
-            price: product.price?.toString() || '',
-            comparePrice: product.comparePrice?.toString() || '',
-            sku: product.sku || '',
-            stock: product.stock?.toString() || '',
-            category: product.category?._id || product.category || '',
-            keywords: product.keywords?.join(', ') || '',
-            ingredients: product.ingredients?.join(', ') || '',
-            brand: product.brand || '',
-            trackInventory: product.trackInventory ?? true,
-            featured: product.featured ?? false,
-            status: product.status || 'draft',
-          })
-          
-          // Set images - backend returns populated media references
-          if (product.images && product.images.length > 0) {
-            const productImages = product.images.map((img: any) => ({
-              mediaId: img.mediaId || img._id,
-              isPrimary: img.isPrimary || false,
-              order: img.order || 0,
-              _previewUrl: img.cloudinaryUrl, // For preview
-            }))
-            setImages(productImages)
-          }
+          setImages(productImages)
+        }
 
-          // Set jewelry details if present
-          if (product.jewelry) {
-            setJewelry(product.jewelry)
-          }
+        // Set jewelry details if present
+        if (product.jewelry && typeof product.jewelry === 'object') {
+          setJewelry(product.jewelry)
         }
       } catch (error: any) {
-        toast.error(error.error || 'Failed to load product')
+        console.error('Failed to fetch product:', error)
+        const errorMessage = error?.response?.data?.error || error?.error || error?.message || 'Failed to load product'
+        toast.error(errorMessage)
         router.push(ROUTES.PRODUCTS)
       } finally {
         setFetching(false)
