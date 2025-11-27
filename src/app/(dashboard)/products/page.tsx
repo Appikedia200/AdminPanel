@@ -371,15 +371,6 @@ export default function ProductsPage() {
         )}
       </div>
 
-      {/* Debug pagination data */}
-      {pagination && console.log('Pagination data:', { 
-        total: pagination.total, 
-        limit: pagination.limit, 
-        totalPages: pagination.totalPages,
-        page: pagination.page,
-        shouldShow: pagination.total > pagination.limit
-      })}
-
       {/* Pagination */}
       {pagination && pagination.total > pagination.limit && (
         <Pagination
