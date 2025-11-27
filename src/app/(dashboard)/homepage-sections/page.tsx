@@ -404,7 +404,6 @@ export default function HomepageSectionsPage() {
 
       <div className="space-y-6">
         {sections
-          .filter((section) => section.type !== 'trending') // Filter out "Trending Now" section
           .sort((a, b) => a.displayOrder - b.displayOrder)
           .map((section) => (
             <SectionCard
