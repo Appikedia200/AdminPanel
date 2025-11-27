@@ -51,28 +51,7 @@ export default function EditProductPage() {
     status: 'draft' as 'draft' | 'active' | 'inactive',
   })
 
-  // Safely determine if selected category is jewelry
-  // Ensure categories is an array before calling .find()
-  const categoriesArray = Array.isArray(categories) ? categories : []
-  const selectedCategory = categoriesArray.find(cat => cat?._id === formData?.category)
-  const isJewelryCategory = selectedCategory?.name?.toLowerCase().includes('jewelry') || 
-                             selectedCategory?.name?.toLowerCase().includes('jewellery') || false
-  
-  // Handle missing product ID
-  if (!productId) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Invalid Product ID</h2>
-          <Button onClick={() => router.push(ROUTES.PRODUCTS)}>
-            Go Back to Products
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
-  // Fetch product data
+  // Fetch product data - MUST be before any conditional returns
   useEffect(() => {
     const fetchProduct = async () => {
       if (!productId) {
@@ -82,24 +61,18 @@ export default function EditProductPage() {
 
       setFetching(true)
       try {
-        console.log('[Product Edit] Fetching product:', productId)
-        const response: any = await httpClient.get(API_ENDPOINTS.products.get(productId))
-        console.log('[Product Edit] Response:', response)
+        const response = await httpClient.get(API_ENDPOINTS.products.get(productId))
         
         if (!response || !response.success || !response.data) {
-          console.error('[Product Edit] Invalid response:', response)
           throw new Error('Failed to load product data')
         }
         
         const product = response.data
-        console.log('[Product Edit] Product data:', product)
         
         // Safely extract category ID
         const categoryId = typeof product.category === 'string' 
           ? product.category 
           : (product.category && typeof product.category === 'object' ? product.category._id : '')
-        
-        console.log('[Product Edit] Category ID:', categoryId)
         
         setFormData({
           name: product.name || '',
@@ -120,12 +93,9 @@ export default function EditProductPage() {
         })
         
         // Set images - backend returns populated media references
-        console.log('[Product Edit] Processing images:', product.images)
         if (Array.isArray(product.images) && product.images.length > 0) {
           try {
-            const productImages = product.images.map((img: any, index: number) => {
-              console.log(`[Product Edit] Image ${index}:`, img)
-              
+            const productImages = product.images.map((img: Record<string, unknown>, index: number) => {
               // mediaId can be a string (ID) or populated object (Media)
               let mediaId = ''
               let previewUrl = ''
@@ -133,40 +103,34 @@ export default function EditProductPage() {
               if (typeof img.mediaId === 'string') {
                 mediaId = img.mediaId
               } else if (img.mediaId && typeof img.mediaId === 'object') {
-                mediaId = img.mediaId._id || ''
-                previewUrl = img.mediaId.cloudinaryUrl || ''
+                const mediaObj = img.mediaId as Record<string, unknown>
+                mediaId = (mediaObj._id as string) || ''
+                previewUrl = (mediaObj.cloudinaryUrl as string) || ''
               } else if (img._id) {
-                mediaId = img._id
+                mediaId = img._id as string
               }
-              
-              console.log(`[Product Edit] Extracted - mediaId: ${mediaId}, previewUrl: ${previewUrl}`)
               
               return {
                 mediaId: mediaId || `temp-${index}`,
-                isPrimary: img.isPrimary ?? (index === 0),
-                order: img.order ?? index,
+                isPrimary: (img.isPrimary as boolean) ?? (index === 0),
+                order: (img.order as number) ?? index,
                 _previewUrl: previewUrl || '/placeholder-image.png',
               }
             }).filter(img => img.mediaId && !img.mediaId.startsWith('temp-'))
             
-            console.log('[Product Edit] Processed images:', productImages)
             setImages(productImages)
-          } catch (imgError) {
-            console.error('[Product Edit] Error processing images:', imgError)
+          } catch {
             setImages([])
           }
         }
 
         // Set jewelry details if present
         if (product.jewelry && typeof product.jewelry === 'object') {
-          console.log('[Product Edit] Setting jewelry:', product.jewelry)
           setJewelry(product.jewelry)
         }
-        
-        console.log('[Product Edit] Fetch complete')
-      } catch (error: any) {
-        console.error('[Product Edit] Fetch error:', error)
-        const errorMessage = error?.response?.data?.error || error?.error || error?.message || 'Failed to load product'
+      } catch (error) {
+        const apiError = error as { response?: { data?: { error?: string } }; error?: string; message?: string }
+        const errorMessage = apiError?.response?.data?.error || apiError?.error || apiError?.message || 'Failed to load product'
         setError(errorMessage)
         toast.error(errorMessage)
       } finally {
@@ -184,6 +148,26 @@ export default function EditProductPage() {
     } else {
       setFormData({ ...formData, [field]: value })
     }
+  }
+  
+  // Safely determine if selected category is jewelry (after all hooks)
+  const categoriesArray = Array.isArray(categories) ? categories : []
+  const selectedCategory = categoriesArray.find(cat => cat?._id === formData?.category)
+  const isJewelryCategory = selectedCategory?.name?.toLowerCase().includes('jewelry') || 
+                             selectedCategory?.name?.toLowerCase().includes('jewellery') || false
+  
+  // Handle missing product ID (after all hooks)
+  if (!productId) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Invalid Product ID</h2>
+          <Button onClick={() => router.push(ROUTES.PRODUCTS)}>
+            Go Back to Products
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
