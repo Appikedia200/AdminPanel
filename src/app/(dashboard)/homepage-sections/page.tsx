@@ -203,7 +203,7 @@ function ProductSelectionModal({
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedIds, setSelectedIds] = useState<string[]>([])
-  const { products, loading } = useProducts({ search: searchQuery, limit: 50 })
+  const { products, loading } = useProducts({ search: searchQuery, limit: 50, populate: 'images.mediaId' })
 
   const availableProducts = products.filter(p => 
     !excludeIds.includes(p._id) && 
@@ -255,19 +255,23 @@ function ProductSelectionModal({
             ) : (
               <div className="space-y-2">
                 {availableProducts.map((product) => {
-                  // ✅ Professional null-safe image URL extraction
+                  // ✅ Extract image URL (mediaId can be string ID or populated object)
                   const productImage = product.images?.[0]
-                  const imageUrl = (() => {
-                    if (!productImage || typeof productImage !== 'object' || !('mediaId' in productImage)) {
-                      return '/placeholder-image.png'
-                    }
+                  let imageUrl = '/placeholder-image.png'
+                  
+                  if (productImage && typeof productImage === 'object' && 'mediaId' in productImage) {
                     const mediaId = productImage.mediaId as any
-                    // Handle both null and valid mediaId objects
-                    if (!mediaId || typeof mediaId !== 'object' || !('cloudinaryUrl' in mediaId)) {
-                      return '/placeholder-image.png'
+                    
+                    if (typeof mediaId === 'string') {
+                      // mediaId is just a string ID - can't get URL without fetching
+                      // For now, use placeholder (backend should populate this field)
+                      imageUrl = '/placeholder-image.png'
+                    } else if (mediaId && typeof mediaId === 'object' && 'cloudinaryUrl' in mediaId) {
+                      // mediaId is populated object with cloudinaryUrl
+                      imageUrl = (mediaId.cloudinaryUrl as string) || '/placeholder-image.png'
                     }
-                    return (mediaId.cloudinaryUrl as string) || '/placeholder-image.png'
-                  })()
+                  }
+                  
                   const isSelected = selectedIds.includes(product._id)
 
                   return (

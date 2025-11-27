@@ -61,7 +61,7 @@ export default function EditProductPage() {
 
       setFetching(true)
       try {
-        const response: any = await httpClient.get(API_ENDPOINTS.products.get(productId))
+        const response: any = await httpClient.get(`${API_ENDPOINTS.products.get(productId)}?populate=images.mediaId,category`)
         
         if (!response || !response.success || !response.data) {
           throw new Error('Failed to load product data')
@@ -95,38 +95,42 @@ export default function EditProductPage() {
         // Set images - backend returns populated media references
         if (Array.isArray(product.images) && product.images.length > 0) {
           try {
-            const productImages = product.images.map((img: Record<string, unknown>, index: number) => {
-              // mediaId can be a string (ID) or populated object (Media)
+            // Fetch media details for all image IDs
+            const imagePromises = product.images.map(async (img: Record<string, unknown>, index: number) => {
               let mediaId = ''
               let previewUrl = ''
               
-              console.log(`Processing image ${index}:`, img)
-              
               if (typeof img.mediaId === 'string') {
+                // mediaId is just an ID string - need to fetch the media URL
                 mediaId = img.mediaId
-                console.log('String mediaId:', mediaId)
+                try {
+                  const mediaResponse: any = await httpClient.get(`/api/media/${mediaId}`)
+                  if (mediaResponse.success && mediaResponse.data?.cloudinaryUrl) {
+                    previewUrl = mediaResponse.data.cloudinaryUrl
+                  }
+                } catch (error) {
+                  console.warn(`Failed to fetch media ${mediaId}:`, error)
+                }
               } else if (img.mediaId && typeof img.mediaId === 'object') {
                 const mediaObj = img.mediaId as Record<string, unknown>
                 mediaId = (mediaObj._id as string) || ''
                 previewUrl = (mediaObj.cloudinaryUrl as string) || ''
-                console.log('Object mediaId - extracted:', { mediaId, previewUrl })
               } else if (img._id) {
                 mediaId = img._id as string
-                console.log('Using img._id:', mediaId)
               }
               
-              const result = {
+              return {
                 mediaId: mediaId || `temp-${index}`,
                 isPrimary: (img.isPrimary as boolean) ?? (index === 0),
                 order: (img.order as number) ?? index,
                 _previewUrl: previewUrl || '/placeholder-image.png',
               }
-              
-              console.log('Mapped image result:', result)
-              return result
-            }).filter((img: any) => img.mediaId && !img.mediaId.startsWith('temp-'))
+            })
             
-            console.log('FINAL images array to set:', productImages)
+            const productImages = (await Promise.all(imagePromises)).filter(
+              (img: any) => img.mediaId && !img.mediaId.startsWith('temp-')
+            )
+            
             setImages(productImages)
           } catch (err) {
             console.error('Error processing images:', err)
