@@ -40,6 +40,7 @@ export default function CategoriesPage() {
     slug: '',
     description: '',
     displayOrder: 1,
+    active: true, // ✅ Required by backend
   })
   const [submitting, setSubmitting] = useState(false)
 
@@ -55,6 +56,7 @@ export default function CategoriesPage() {
         slug: category.slug,
         description: category.description || '',
         displayOrder: category.displayOrder,
+        active: category.active, // ✅ Include active field
       })
     } else {
       setEditingCategory(null)
@@ -63,6 +65,7 @@ export default function CategoriesPage() {
         slug: '',
         description: '',
         displayOrder: categories.length + 1,
+        active: true, // ✅ Default to active for new categories
       })
     }
     setDialogOpen(true)
@@ -76,6 +79,7 @@ export default function CategoriesPage() {
       slug: '',
       description: '',
       displayOrder: 1,
+      active: true, // ✅ Reset to active
     })
   }
 
