@@ -14,9 +14,11 @@ export function useCategories() {
       setLoading(true)
       setError(null)
       const response = await repository.findAll()
-      // Ensure we always set an array, even if backend returns unexpected data
-      const categoriesData = Array.isArray(response.data) ? response.data : []
-      setCategories(categoriesData)
+      // ✅ FIX: Backend returns { data: { categories: [] } }
+      const responseData = response.data as any
+      const categoriesData = responseData?.categories || responseData || []
+      // Ensure we always set an array
+      setCategories(Array.isArray(categoriesData) ? categoriesData : [])
     } catch (err: any) {
       const errorMessage = err.error || 'Failed to load categories'
       setError(errorMessage)

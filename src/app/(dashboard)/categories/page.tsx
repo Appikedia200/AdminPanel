@@ -88,11 +88,19 @@ export default function CategoriesPage() {
     setSubmitting(true)
 
     try {
+      // ✅ Prepare data - remove empty slug (let backend auto-generate)
+      const dataToSend = {
+        name: formData.name,
+        description: formData.description || undefined,
+        displayOrder: formData.displayOrder,
+        ...(formData.slug ? { slug: formData.slug } : {}), // Only include slug if provided
+      }
+
       if (editingCategory) {
-        await repository.update(editingCategory._id, formData)
+        await repository.update(editingCategory._id, dataToSend)
         toast.success('Category updated successfully')
       } else {
-        await repository.create(formData)
+        await repository.create(dataToSend)
         toast.success('Category created successfully')
       }
       
@@ -241,14 +249,16 @@ export default function CategoriesPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="slug">Slug *</Label>
+              <Label htmlFor="slug">Slug (auto-generated if empty)</Label>
               <Input
                 id="slug"
                 value={formData.slug}
                 onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                placeholder="serums"
-                required
+                placeholder="serums (auto-generated from name)"
               />
+              <p className="text-xs text-muted-foreground">
+                Leave empty to auto-generate from category name
+              </p>
             </div>
 
             <div className="space-y-2">
