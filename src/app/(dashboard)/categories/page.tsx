@@ -89,12 +89,18 @@ export default function CategoriesPage() {
 
     try {
       // ✅ CRITICAL: Include ALL required fields with correct field names
-      const dataToSend = {
+      const dataToSend: Record<string, any> = {
         name: formData.name,
-        description: formData.description || undefined,
         displayOrder: formData.displayOrder,
         isActive: formData.isActive, // ✅ Backend expects 'isActive', not 'active'
-        ...(formData.slug?.trim() ? { slug: formData.slug.trim() } : {}), // Only include slug if provided
+      }
+      
+      // Only include optional fields if they have values
+      if (formData.slug?.trim()) {
+        dataToSend.slug = formData.slug.trim()
+      }
+      if (formData.description?.trim()) {
+        dataToSend.description = formData.description.trim()
       }
 
       if (editingCategory) {
