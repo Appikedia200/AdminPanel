@@ -95,7 +95,8 @@ export default function CategoriesPage() {
       handleCloseDialog()
       refetch()
     } catch (error: any) {
-      toast.error(error.error || 'Operation failed')
+      const errorMessage = error?.error || error?.message || error?.response?.data?.error || error?.response?.data?.message || 'Operation failed'
+      toast.error(errorMessage)
     } finally {
       setSubmitting(false)
     }
@@ -109,7 +110,8 @@ export default function CategoriesPage() {
       toast.success('Category deleted successfully')
       refetch()
     } catch (error: any) {
-      toast.error(error.error || 'Failed to delete category')
+      const errorMessage = error?.error || error?.message || error?.response?.data?.error || error?.response?.data?.message || 'Failed to delete category'
+      toast.error(errorMessage)
     }
   }
 
