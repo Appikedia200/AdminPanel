@@ -61,7 +61,7 @@ export default function EditProductPage() {
 
       setFetching(true)
       try {
-        const response = await httpClient.get(API_ENDPOINTS.products.get(productId))
+        const response: any = await httpClient.get(API_ENDPOINTS.products.get(productId))
         
         if (!response || !response.success || !response.data) {
           throw new Error('Failed to load product data')
