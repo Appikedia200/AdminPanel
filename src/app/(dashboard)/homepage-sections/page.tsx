@@ -222,7 +222,7 @@ function ProductSelectionModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
-      <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl max-h-[80vh] overflow-hidden">
+      <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[95vw] sm:w-full max-w-3xl max-h-[85vh] overflow-hidden">
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -271,8 +271,9 @@ function ProductSelectionModal({
                   const isSelected = selectedIds.includes(product._id)
 
                   return (
-                    <div
+                    <button
                       key={product._id}
+                      type="button"
                       onClick={() => {
                         setSelectedIds(prev =>
                           prev.includes(product._id)
@@ -280,7 +281,7 @@ function ProductSelectionModal({
                             : [...prev, product._id]
                         )
                       }}
-                      className={`flex items-start sm:items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
+                      className={`w-full flex items-center gap-3 p-3 border rounded-lg text-left transition-colors ${
                         isSelected ? 'bg-primary/10 border-primary' : 'hover:bg-accent'
                       }`}
                     >
@@ -289,28 +290,34 @@ function ProductSelectionModal({
                       <img
                         src={imageUrl}
                         alt={product.name}
-                        className="h-12 w-12 sm:h-14 sm:w-14 rounded object-cover flex-shrink-0"
+                        className="w-16 h-16 rounded object-cover flex-shrink-0"
                       />
                       
-                      {/* Product Info - Takes remaining space */}
-                      <div className="flex-1 min-w-0 overflow-hidden">
-                        <p className="font-medium text-sm sm:text-base mb-1 break-words line-clamp-2">
+                      {/* Product Info */}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-sm leading-tight mb-1.5">
                           {product.name}
-                        </p>
-                        <p className="text-sm text-muted-foreground font-semibold">
+                        </h4>
+                        <p className="text-sm text-primary font-semibold">
                           {formatCurrency(product.price)}
                         </p>
                       </div>
                       
-                      {/* Selection Badge */}
-                      <div className="flex-shrink-0 self-center">
-                        {isSelected && (
-                          <Badge variant="default" className="text-xs whitespace-nowrap">
-                            Selected
-                          </Badge>
-                        )}
+                      {/* Checkbox/Selection Indicator */}
+                      <div className="flex-shrink-0">
+                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                          isSelected 
+                            ? 'bg-primary border-primary' 
+                            : 'border-gray-300'
+                        }`}>
+                          {isSelected && (
+                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    </button>
                   )
                 })}
               </div>
