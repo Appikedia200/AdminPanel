@@ -3,6 +3,7 @@
  * @param data Array of objects to export
  * @param filename Filename without extension
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function exportToCSV(data: any[], filename: string) {
   if (!data || data.length === 0) {
     console.error('No data to export')

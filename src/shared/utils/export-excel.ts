@@ -6,6 +6,7 @@ import * as XLSX from 'xlsx'
  * @param filename Filename without extension
  * @param sheetName Optional sheet name (defaults to 'Data')
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function exportToExcel(data: any[], filename: string, sheetName: string = 'Data') {
   if (!data || data.length === 0) {
     console.error('No data to export')
@@ -43,6 +44,7 @@ export function exportToExcel(data: any[], filename: string, sheetName: string =
  * @param sheets Array of { name, data } objects
  * @param filename Filename without extension
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function exportToExcelMultiSheet(
   sheets: Array<{ name: string; data: any[] }>,
   filename: string
