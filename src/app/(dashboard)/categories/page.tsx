@@ -277,7 +277,12 @@ export default function CategoriesPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Category Name *</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="name">Category Name *</Label>
+                <span className={`text-xs ${formData.name.length > 100 ? 'text-red-500 font-medium' : 'text-muted-foreground'}`}>
+                  {formData.name.length}/100
+                </span>
+              </div>
               <Input
                 id="name"
                 value={formData.name}
@@ -286,9 +291,16 @@ export default function CategoriesPage() {
                   const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
                   setFormData({ ...formData, name, slug })
                 }}
+                maxLength={100}
                 placeholder="e.g., Serums"
                 required
+                className={formData.name.length > 100 ? 'border-red-500' : ''}
               />
+              {formData.name.length > 100 && (
+                <p className="text-xs text-red-500">
+                  Name is too long. Maximum 100 characters allowed.
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -305,15 +317,30 @@ export default function CategoriesPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="description">Description</Label>
+                <span className={`text-xs ${formData.description.length > 500 ? 'text-red-500 font-medium' : 'text-muted-foreground'}`}>
+                  {formData.description.length}/500
+                </span>
+              </div>
               <textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                maxLength={500}
                 rows={3}
-                className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className={`flex w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
+                  formData.description.length > 500 
+                    ? 'border-red-500 focus-visible:ring-red-500' 
+                    : 'border-input focus-visible:ring-ring'
+                }`}
                 placeholder="Category description..."
               />
+              {formData.description.length > 500 && (
+                <p className="text-xs text-red-500">
+                  Description is too long. Maximum 500 characters allowed.
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
