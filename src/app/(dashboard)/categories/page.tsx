@@ -108,21 +108,22 @@ export default function CategoriesPage() {
       handleCloseDialog()
       refetch()
     } catch (error: any) {
-      // ✅ PROFESSIONAL: Extract backend error message with all possible paths
+      // ✅ PROFESSIONAL: Extract backend error message (handles ALL formats)
       let errorMessage = 'Operation failed'
       
-      if (error?.response?.data?.error) {
+      // Check each potential error source and ensure it's a STRING
+      if (typeof error?.response?.data?.error === 'string' && error.response.data.error) {
         errorMessage = error.response.data.error
-      } else if (error?.response?.data?.message) {
+      } else if (error?.response?.data?.error && typeof error.response.data.error === 'object') {
+        // If error is an object, extract message from it
+        errorMessage = error.response.data.error.message || JSON.stringify(error.response.data.error)
+      } else if (typeof error?.response?.data?.message === 'string' && error.response.data.message) {
         errorMessage = error.response.data.message
-      } else if (error?.error) {
+      } else if (typeof error?.error === 'string' && error.error) {
         errorMessage = error.error
-      } else if (error?.message) {
+      } else if (typeof error?.message === 'string' && error.message) {
         errorMessage = error.message
       }
-      
-      // Log for debugging
-      console.error('Category operation error:', error)
       
       toast.error(errorMessage, {
         duration: 5000, // Show for 5 seconds so user can read
@@ -140,21 +141,22 @@ export default function CategoriesPage() {
       toast.success('Category deleted successfully')
       refetch()
     } catch (error: any) {
-      // ✅ PROFESSIONAL: Extract specific backend error message
+      // ✅ PROFESSIONAL: Extract specific backend error message (handles ALL formats)
       let errorMessage = 'Failed to delete category'
       
-      if (error?.response?.data?.error) {
+      // Check each potential error source and ensure it's a STRING
+      if (typeof error?.response?.data?.error === 'string' && error.response.data.error) {
         errorMessage = error.response.data.error
-      } else if (error?.response?.data?.message) {
+      } else if (error?.response?.data?.error && typeof error.response.data.error === 'object') {
+        // If error is an object, extract message from it
+        errorMessage = error.response.data.error.message || JSON.stringify(error.response.data.error)
+      } else if (typeof error?.response?.data?.message === 'string' && error.response.data.message) {
         errorMessage = error.response.data.message
-      } else if (error?.error) {
+      } else if (typeof error?.error === 'string' && error.error) {
         errorMessage = error.error
-      } else if (error?.message) {
+      } else if (typeof error?.message === 'string' && error.message) {
         errorMessage = error.message
       }
-      
-      // Log for debugging
-      console.error('Category delete error:', error)
       
       toast.error(errorMessage, {
         duration: 5000, // Show for 5 seconds so user can read
