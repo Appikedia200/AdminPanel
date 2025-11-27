@@ -100,26 +100,36 @@ export default function EditProductPage() {
               let mediaId = ''
               let previewUrl = ''
               
+              console.log(`Processing image ${index}:`, img)
+              
               if (typeof img.mediaId === 'string') {
                 mediaId = img.mediaId
+                console.log('String mediaId:', mediaId)
               } else if (img.mediaId && typeof img.mediaId === 'object') {
                 const mediaObj = img.mediaId as Record<string, unknown>
                 mediaId = (mediaObj._id as string) || ''
                 previewUrl = (mediaObj.cloudinaryUrl as string) || ''
+                console.log('Object mediaId - extracted:', { mediaId, previewUrl })
               } else if (img._id) {
                 mediaId = img._id as string
+                console.log('Using img._id:', mediaId)
               }
               
-              return {
+              const result = {
                 mediaId: mediaId || `temp-${index}`,
                 isPrimary: (img.isPrimary as boolean) ?? (index === 0),
                 order: (img.order as number) ?? index,
                 _previewUrl: previewUrl || '/placeholder-image.png',
               }
+              
+              console.log('Mapped image result:', result)
+              return result
             }).filter((img: any) => img.mediaId && !img.mediaId.startsWith('temp-'))
             
+            console.log('FINAL images array to set:', productImages)
             setImages(productImages)
-          } catch {
+          } catch (err) {
+            console.error('Error processing images:', err)
             setImages([])
           }
         }
