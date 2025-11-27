@@ -25,7 +25,9 @@ export class CategoryRepositoryImpl implements ICategoryRepository {
             page: 1,
             limit: response.length,
             total: response.length,
-            totalPages: 1
+            totalPages: 1,
+            hasNextPage: false,
+            hasPrevPage: false
           }
         } as PaginatedResponse<Category>
       }
@@ -38,7 +40,9 @@ export class CategoryRepositoryImpl implements ICategoryRepository {
           page: 1,
           limit: 10,
           total: 0,
-          totalPages: 0
+          totalPages: 0,
+          hasNextPage: false,
+          hasPrevPage: false
         }
       } as PaginatedResponse<Category>
     } catch {
@@ -50,7 +54,9 @@ export class CategoryRepositoryImpl implements ICategoryRepository {
           page: 1,
           limit: 10,
           total: 0,
-          totalPages: 0
+          totalPages: 0,
+          hasNextPage: false,
+          hasPrevPage: false
         }
       } as PaginatedResponse<Category>
     }
