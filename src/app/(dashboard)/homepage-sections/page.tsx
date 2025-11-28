@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/compone
 import { Badge } from '@/presentation/components/ui/badge'
 import { Skeleton } from '@/presentation/components/ui/skeleton'
 import { useHomepageSections } from '@/presentation/hooks/use-homepage-sections'
-import { useProducts } from '@/presentation/hooks/use-products'
+import { useProductsWithImages } from '@/presentation/hooks/use-products-with-images'
 import type { HomepageSection, Product } from '@/shared/types/entity.types'
 import { formatCurrency } from '@/shared/utils/format'
 import { toast } from 'sonner'
@@ -203,7 +203,7 @@ function ProductSelectionModal({
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedIds, setSelectedIds] = useState<string[]>([])
-  const { products, loading } = useProducts({ search: searchQuery, limit: 50, populate: 'images.mediaId' })
+  const { products, loading } = useProductsWithImages({ search: searchQuery, limit: 50 })
 
   const availableProducts = products.filter(p => 
     !excludeIds.includes(p._id) && 
@@ -255,23 +255,8 @@ function ProductSelectionModal({
             ) : (
               <div className="space-y-2">
                 {availableProducts.map((product) => {
-                  // ✅ Extract image URL (mediaId can be string ID or populated object)
-                  const productImage = product.images?.[0]
-                  let imageUrl = '/placeholder-image.png'
-                  
-                  if (productImage && typeof productImage === 'object' && 'mediaId' in productImage) {
-                    const mediaId = productImage.mediaId as any
-                    
-                    if (typeof mediaId === 'string') {
-                      // mediaId is just a string ID - can't get URL without fetching
-                      // For now, use placeholder (backend should populate this field)
-                      imageUrl = '/placeholder-image.png'
-                    } else if (mediaId && typeof mediaId === 'object' && 'cloudinaryUrl' in mediaId) {
-                      // mediaId is populated object with cloudinaryUrl
-                      imageUrl = (mediaId.cloudinaryUrl as string) || '/placeholder-image.png'
-                    }
-                  }
-                  
+                  // ✅ Use pre-fetched image URL from custom hook
+                  const imageUrl = (product as any)._imageUrl || '/placeholder-image.png'
                   const isSelected = selectedIds.includes(product._id)
 
                   return (
