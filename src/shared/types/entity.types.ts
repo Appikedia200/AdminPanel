@@ -175,6 +175,7 @@ export interface Category extends BaseEntity {
   slug: string
   description?: string
   image?: string
+  parentCategory?: string | null // ✅ Hierarchical categories: null = root, string = child of parent ID
   displayOrder: number
   active: boolean // Use this field for active/inactive status
   productCount?: number

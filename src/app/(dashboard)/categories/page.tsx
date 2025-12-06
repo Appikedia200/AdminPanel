@@ -41,6 +41,7 @@ export default function CategoriesPage() {
     description: '',
     displayOrder: 1,
     isActive: true, // ✅ Backend expects 'isActive', not 'active'
+    parentCategory: null as string | null, // ✅ Hierarchical categories support
   })
   const [submitting, setSubmitting] = useState(false)
 
@@ -57,6 +58,7 @@ export default function CategoriesPage() {
         description: category.description || '',
         displayOrder: category.displayOrder,
         isActive: category.active, // ✅ Map 'active' from category to 'isActive' for form
+        parentCategory: category.parentCategory || null, // ✅ Populate parentCategory for editing
       })
     } else {
       setEditingCategory(null)
@@ -66,6 +68,7 @@ export default function CategoriesPage() {
         description: '',
         displayOrder: categories.length + 1,
         isActive: true, // ✅ Default to active for new categories
+        parentCategory: null, // ✅ Default to root category (no parent)
       })
     }
     setDialogOpen(true)
@@ -80,6 +83,7 @@ export default function CategoriesPage() {
       description: '',
       displayOrder: 1,
       isActive: true, // ✅ Reset to active
+      parentCategory: null, // ✅ Reset to root category
     })
   }
 
@@ -93,6 +97,7 @@ export default function CategoriesPage() {
         name: formData.name,
         displayOrder: formData.displayOrder,
         isActive: formData.isActive, // ✅ Backend expects 'isActive', not 'active'
+        parentCategory: formData.parentCategory || null, // ✅ Send parentCategory (null for root categories)
       }
       
       // Only include optional fields if they have values
@@ -140,6 +145,16 @@ export default function CategoriesPage() {
   }
 
   const handleDelete = async (id: string, name: string) => {
+    // ✅ PROTECTION: Check if this category has children
+    const hasChildren = categories.some(cat => cat.parentCategory === id)
+    
+    if (hasChildren) {
+      toast.error('Cannot delete category with subcategories. Please remove or reassign subcategories first.', {
+        duration: 5000,
+      })
+      return
+    }
+
     if (!confirm(`Are you sure you want to delete "${name}"?`)) return
 
     try {
@@ -229,34 +244,52 @@ export default function CategoriesPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredCategories.map((category) => (
-                <TableRow key={category._id}>
-                  <TableCell className="font-medium">{category.name}</TableCell>
-                  <TableCell className="text-muted-foreground">{category.slug}</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {category.description || '-'}
-                  </TableCell>
-                  <TableCell>{category.displayOrder}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleOpenDialog(category)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(category._id, category.name)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {filteredCategories.map((category) => {
+                // ✅ Find parent category if this is a child
+                const parentCat = categories.find(c => c._id === category.parentCategory)
+                const isChild = !!category.parentCategory
+                
+                return (
+                  <TableRow key={category._id}>
+                    <TableCell className="font-medium">
+                      {/* ✅ Visual hierarchy indicator */}
+                      {isChild && (
+                        <span className="text-muted-foreground mr-2">└─</span>
+                      )}
+                      {category.name}
+                      {/* ✅ Show parent name for child categories */}
+                      {parentCat && (
+                        <span className="text-xs text-muted-foreground ml-2 font-normal">
+                          (child of {parentCat.name})
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{category.slug}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {category.description || '-'}
+                    </TableCell>
+                    <TableCell>{category.displayOrder}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleOpenDialog(category)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(category._id, category.name)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
             </TableBody>
           </Table>
         )}
@@ -313,6 +346,34 @@ export default function CategoriesPage() {
               />
               <p className="text-xs text-muted-foreground">
                 Leave empty to auto-generate from category name
+              </p>
+            </div>
+
+            {/* ✅ NEW: Parent Category Selection for Hierarchical Categories */}
+            <div className="space-y-2">
+              <Label htmlFor="parentCategory">Parent Category</Label>
+              <select
+                id="parentCategory"
+                value={formData.parentCategory || ''}
+                onChange={(e) => setFormData({ ...formData, parentCategory: e.target.value || null })}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="">None (Root Category)</option>
+                {categories
+                  .filter(cat => {
+                    // ✅ Only show root categories as parent options
+                    // ✅ Exclude self when editing to prevent circular reference
+                    return !cat.parentCategory && cat._id !== editingCategory?._id
+                  })
+                  .sort((a, b) => a.displayOrder - b.displayOrder)
+                  .map(cat => (
+                    <option key={cat._id} value={cat._id}>
+                      {cat.name}
+                    </option>
+                  ))}
+              </select>
+              <p className="text-xs text-muted-foreground">
+                Select a parent category to create a subcategory. Leave as &quot;None&quot; to create a root category.
               </p>
             </div>
 
